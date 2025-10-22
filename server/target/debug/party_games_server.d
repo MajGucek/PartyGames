@@ -1,0 +1,1 @@
+/home/maj/PartyGames/server/target/debug/party_games_server: /home/maj/PartyGames/server/src/main.rs /home/maj/PartyGames/shared/src/helper.rs /home/maj/PartyGames/shared/src/lib.rs /home/maj/PartyGames/shared/src/messages.rs

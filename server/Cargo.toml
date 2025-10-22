@@ -1,0 +1,16 @@
+[package]
+name = "party_games_server"
+version = "0.1.0"
+edition = "2024"
+authors = ["Maj Guček <maj.gucek@gmail.com>"]
+description = "Bevy server for PartyGames"
+license = "GPL-3.0"
+
+[dependencies]
+shared = { path = "../shared" }
+tokio = { version = "1.47.1", features= ["full"] }
+serde = { version = "1.0.228", features = ["derive"] }
+bincode = "2.0.1"
+
+uuid = { version = "1.3.1", features = ["v4"] }
+

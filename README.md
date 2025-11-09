@@ -25,9 +25,9 @@ Vse kar potrebujete, je implementacija dveh razredov: enega na **Server** strani
 ### Server Side
 
 - Package: `Server:org.PartyGames.Games`  
-- Razred mora podedovati **GameStrategy** abstraktni razred in implementirati:
+- Razred mora extendati **GameStrategy** abstract class in implementirati:
 
-  - Konstruktor, ki ustreza super + morebitni dodatni parametri  
+  - Construktor, matching super + Optional dodatni parametri  
   - `handleGame()`  
   - `getGame()`
 
@@ -42,9 +42,9 @@ Vse kar potrebujete, je implementacija dveh razredov: enega na **Server** strani
 ### Client Side
 
 - Package: `Client:org.PartyGames.GameHandlers`  
-- Razred mora implementirati:
+- Razred mora extendati **GameHandler** abstract class in implementirati:
 
-  - Konstruktor, ki ustreza super + morebitni dodatni parametri  
+  - Konstruktor, ki ustreza super + Optional dodatni parametri  
   - `handleGame(List<NetworkMessage>)`  
   - `getGame()`
 

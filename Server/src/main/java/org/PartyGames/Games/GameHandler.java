@@ -1,6 +1,5 @@
-package org.PartyGames;
+package org.PartyGames.Games;
 
-import org.PartyGames.Games.GameStrategy;
 import org.PartyGames.Networking.MessageType;
 import org.PartyGames.Networking.NetworkMessageBuilder;
 import org.PartyGames.ServerHandlers.WebSocketServerHandler;
@@ -52,15 +51,17 @@ public class GameHandler {
             connection.clearBuffer();
             logger.info("Finished with a game!");
 
-            NetworkMessageBuilder builder = new NetworkMessageBuilder();
-            builder.setToBroadcast().setMessageType(MessageType.NewGame).setGame(game.getGame());
-            connection.notifyClients(builder.exportMessage());
+
 
             game = GameFactory.createGame(GameFactory.getRandomGame(), connection);
             if (game == null) {
                 logger.error("Error, null game");
             }
             logger.info("Created Game: {}", game.getGame());
+
+            NetworkMessageBuilder builder = new NetworkMessageBuilder();
+            builder.setToBroadcast().setMessageType(MessageType.NewGame).setGame(game.getGame());
+            connection.notifyClients(builder.exportMessage());
             game.start();
         }
 

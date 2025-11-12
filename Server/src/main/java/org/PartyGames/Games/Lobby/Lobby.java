@@ -1,5 +1,6 @@
-package org.PartyGames.Games;
+package org.PartyGames.Games.Lobby;
 
+import org.PartyGames.Games.GameStrategy;
 import org.PartyGames.Networking.MessageType;
 import org.PartyGames.Networking.NetworkMessage;
 import org.PartyGames.Networking.NetworkMessageBuilder;

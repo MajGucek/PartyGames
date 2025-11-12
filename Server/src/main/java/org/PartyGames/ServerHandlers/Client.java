@@ -1,4 +1,4 @@
-package org.PartyGames;
+package org.PartyGames.ServerHandlers;
 
 import com.fasterxml.uuid.Generators;
 

@@ -14,7 +14,7 @@ public class NetworkMessage {
     public NetworkMessage() {
         type = MessageType.Invalid;
         text = "";
-        game = Games.Null;
+        game = null;
         uuid = "";
     }
     public NetworkMessage(MessageType type, String text, Games game, String uuid) {

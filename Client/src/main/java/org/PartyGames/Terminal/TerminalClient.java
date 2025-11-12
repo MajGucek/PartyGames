@@ -73,10 +73,12 @@ public class TerminalClient {
                     logger.info("Got UUID: {}", uuid);
                 }
                 case MessageType.NewGame -> {
-                    game_handler.stopGame();
-                    logger.info("Going to NewGame to: {}", message.getGame().toString());
-                    game_handler = GameHandlerFactory.createGameHandler(message.getGame(), io_handler, connection, uuid);
-                    game_handler.startGame();
+                    if (message.getGame() != game_handler.getGame()) {
+                        game_handler.stopGame();
+                        logger.info("Going to NewGame to: {}", message.getGame().toString());
+                        game_handler = GameHandlerFactory.createGameHandler(message.getGame(), io_handler, connection, uuid);
+                        game_handler.startGame();
+                    }
                 }
                 case MessageType.GameStatus -> {
                     if (game_handler.getGame() != message.getGame()) {

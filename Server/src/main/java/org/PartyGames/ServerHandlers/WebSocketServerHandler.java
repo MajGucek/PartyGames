@@ -1,7 +1,6 @@
 package org.PartyGames.ServerHandlers;
 
 
-import org.PartyGames.Client;
 import org.PartyGames.Networking.MessageType;
 import org.PartyGames.Networking.NetworkMessage;
 import org.PartyGames.Networking.NetworkMessageBuilder;

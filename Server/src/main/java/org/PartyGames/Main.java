@@ -1,12 +1,14 @@
 package org.PartyGames;
 
+import org.PartyGames.Games.GameHandler;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
-        int port = 8887;
+        int port = 8886;
         GameHandler game = new GameHandler(port);
         game.start();
         try {

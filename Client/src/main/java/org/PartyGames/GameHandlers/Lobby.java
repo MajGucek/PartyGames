@@ -14,13 +14,21 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class Lobby extends GameHandler {
-    private String name;
+    private String unconfirmed_name;
+    private String confirmed_name;
     private boolean has_sent_name;
+    private boolean is_name_registered;
+    private boolean was_name_denied;
+    private boolean vote_start_games;
     protected static final Logger logger = LoggerFactory.getLogger(Lobby.class);
-    public Lobby(TerminalIOHandler io_handler, WebSocketConnectionHandler connection) {
-        super(io_handler, connection);
-        this.name = "";
+    public Lobby(TerminalIOHandler io_handler, WebSocketConnectionHandler connection, String uuid) {
+        super(io_handler, connection, uuid);
+        this.unconfirmed_name = "";
+        this.confirmed_name = "";
         has_sent_name = false;
+        is_name_registered = false;
+        was_name_denied = false;
+        vote_start_games = false;
     }
 
     @Override
@@ -32,58 +40,117 @@ public class Lobby extends GameHandler {
     public void stopGame() {
         logger.info("Exiting Lobby!");
     }
+    private void processServerMessages(List<NetworkMessage> server_messages) {
+        if (server_messages == null) {
+            io_handler.clearScreen();
+            return;
+        }
+         for (NetworkMessage message : server_messages) {
+             switch (message.getType()) {
+                 case MessageType.ClientName -> {
+                     // unconfirmed_name was accepted
+                     logger.info("Name was accepted");
+                     is_name_registered = true;
+                     confirmed_name = message.getText();
+                 }
+                 case MessageType.ClientError -> {
+                     logger.info("Name was denied!");
+                     is_name_registered = false;
+                     unconfirmed_name = "";
+                     was_name_denied = true;
+                 }
+             }
+        }
+    }
 
     @Override
     public void handleGame(List<NetworkMessage> messages) {
+        processServerMessages(messages);
+        processIO();
+        io_handler.render();
+    }
 
-
-        KeyStroke inputs = io_handler.poll();
+    private void processIO() {
         io_handler.clearScreen();
+        KeyStroke input = io_handler.poll();
+        StringBuilder string_builder = new StringBuilder(unconfirmed_name);
+        if (input != null) {
+            switch (input.getKeyType()) {
+                case KeyType.Character -> {
+                    if (!has_sent_name) {
+                        string_builder.append(input.getCharacter());
+                        unconfirmed_name = string_builder.toString();
+                    }
+                    if (is_name_registered) {
+                        NetworkMessageBuilder vote = new NetworkMessageBuilder();
 
-        NetworkMessageBuilder builder = new NetworkMessageBuilder();
-        builder.setMessageType(MessageType.PlayerEvent);
+                        vote.setUUID(uuid).setMessageType(MessageType.ClientEvent);
 
-        StringBuilder string_builder = new StringBuilder(name);
-        String input = String.valueOf(inputs.getCharacter());
-        if (inputs.getKeyType() == KeyType.Character) {
-            if (!has_sent_name) {
-                string_builder.append(inputs.getCharacter());
-                name = string_builder.toString();
-            }
-        } else {
-            if (inputs.getKeyType() == KeyType.Backspace) {
-                if (!has_sent_name) {
-                    if (!string_builder.isEmpty()) {
-                        string_builder.deleteCharAt(string_builder.length() - 1);
-                        name = string_builder.toString();
+                        if (input.getCharacter().equals('y')) {
+                            vote.setText("Y");
+
+                            connection.send(vote.exportMessage());
+
+                            vote_start_games = true;
+                        } else if (input.getCharacter().equals('n')) {
+                            vote.setText("N");
+                            connection.send(vote.exportMessage());
+                            vote_start_games = false;
+                        }
+                    }
+                }
+                case KeyType.Backspace -> {
+                    if (!has_sent_name) {
+                        if (!string_builder.isEmpty()) {
+                            string_builder.deleteCharAt(string_builder.length() - 1);
+                            unconfirmed_name = string_builder.toString();
+                        }
+                    }
+                }
+                case KeyType.Enter -> {
+                    if (input.getKeyType() == KeyType.Enter) {
+                        if (!has_sent_name) {
+                            NetworkMessageBuilder builder = new NetworkMessageBuilder();
+                            builder.setUUID(uuid).setMessageType(MessageType.ClientName);
+                            has_sent_name = true;
+                            builder.setText(unconfirmed_name);
+                            connection.send(builder.exportJSON());
+                            logger.info("Sent: {}", builder.exportJSON());
+                        }
+                        if (was_name_denied) {
+                            unconfirmed_name = "";
+                            has_sent_name = false;
+                            was_name_denied = false;
+                            is_name_registered = false;
+                        }
                     }
                 }
             }
-            if (inputs.getKeyType() == KeyType.Enter) {
-                if (!has_sent_name) {
-                    has_sent_name = true;
-                    builder.setText(name);
-                    connection.send(builder.exportJSON());
-                    logger.info("Sent: {}", builder.exportJSON());
-                }
+        }
+
+        if (has_sent_name && !is_name_registered) {
+            if (was_name_denied) {
+                io_handler.drawText(0, 5, "Your name was denied!", "rgb(255, 0, 0)");
+                io_handler.drawText(0, 6, "Press Enter to re-enter name", "rgb(255, 255, 255)");
+            } else {
+                io_handler.drawText(0, 5, "You have sent Name: "
+                        + unconfirmed_name +
+                        ", Waiting for response", "rgb(255, 0, 255)");
+            }
+
+        } else if (!has_sent_name && !is_name_registered) {
+            io_handler.drawText(0, 5, "Input Name: " + unconfirmed_name, "rgb(255, 125, 255)");
+        }
+
+        if (is_name_registered && !confirmed_name.isEmpty()) {
+            io_handler.drawText(4, 2, "Your Name: " + confirmed_name, "rgb(0, 255, 0)");
+            io_handler.drawText(4, 3, "Press y/n to vote to start/remove your vote", "rgb(255, 255, 255)");
+            if (vote_start_games) {
+                io_handler.drawText(11, 4, "Yes", "rgb(0, 0, 255)");
+            } else {
+                io_handler.drawText(11, 4, "No", "rgb(255, 0, 0)");
             }
         }
-        logger.info(input);
-
-        if (has_sent_name) {
-            io_handler.drawText(0, 6, "You have sent name: " + name, "rgb(0, 255, 0)");
-        } else {
-            io_handler.drawText(0, 5, "Input name: " + name, "rgb(255, 125, 255)");
-        }
-
-        /*
-        for (NetworkMessage message : messages) {
-            logger.info("{}, {}", message.getType().toString(), message.getText());
-        }
-         */
-
-        io_handler.render();
-
     }
 
     @Override

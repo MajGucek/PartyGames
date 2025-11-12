@@ -37,7 +37,7 @@ public class WebSocketConnectionHandler extends WebSocketClient {
 
     public void start() {
         try {
-            connect();
+            connectBlocking();
         }
         catch (Exception e) {
             logger.error("Failed to Connect, Exception: {}", String.valueOf(e));
@@ -46,6 +46,7 @@ public class WebSocketConnectionHandler extends WebSocketClient {
 
 
     public void restart() {
+        logger.warn("Restarting connection!");
         synchronized (server_messages) {
             server_messages.clear();
         }
@@ -64,7 +65,12 @@ public class WebSocketConnectionHandler extends WebSocketClient {
 
 
     public List<NetworkMessage> consumeMessages() {
-        if (!isConnected()) { return new ArrayList<>(); }
+        if (!isConnected()) {
+            logger.error("The Client isn't connected to the server!");
+            is_connected = false;
+            restart();
+            return null;
+        }
 
         synchronized (server_messages) {
             List<NetworkMessage> clone = new ArrayList<NetworkMessage>(server_messages);
@@ -75,7 +81,6 @@ public class WebSocketConnectionHandler extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
-        //server_messages.add("Uhh... connected successfully!");
         NetworkMessageBuilder builder = new NetworkMessageBuilder();
         builder.setMessageType(MessageType.NetworkStatus).setText("Connected to server!");
         server_messages.add(builder.exportMessage());

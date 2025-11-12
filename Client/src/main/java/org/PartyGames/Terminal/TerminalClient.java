@@ -4,6 +4,7 @@ package org.PartyGames.Terminal;
 import org.PartyGames.ConnectionHandlers.WebSocketConnectionHandler;
 import org.PartyGames.GameHandlers.GameHandler;
 import org.PartyGames.GameHandlers.GameHandlerFactory;
+import org.PartyGames.Networking.MessageType;
 import org.PartyGames.Networking.NetworkMessage;
 import org.PartyGames.Shared.Games;
 
@@ -15,16 +16,19 @@ import org.slf4j.LoggerFactory;
 
 public class TerminalClient {
     private static final Logger logger = LoggerFactory.getLogger(TerminalClient.class);
+    private String uuid;
     private long last_reconnect_attempt;
     private final TerminalIOHandler io_handler;
     private final WebSocketConnectionHandler connection;
     private GameHandler game_handler;
 
     public TerminalClient(WebSocketConnectionHandler connection_handler, TerminalIOHandler io_handler) {
+        this.uuid = "";
         last_reconnect_attempt = 0;
         this.io_handler = io_handler;
         this.connection = connection_handler;
-        this.game_handler = GameHandlerFactory.createGameHandler(Games.Null, io_handler, connection);
+        this.game_handler = GameHandlerFactory.createGameHandler(Games.Null, io_handler, connection, uuid);
+
     }
 
     private void checkConnectionTryReconnect()  {
@@ -47,26 +51,40 @@ public class TerminalClient {
 
     public void update() {
         checkConnectionTryReconnect();
-        List<NetworkMessage> messages_for_game = new ArrayList<NetworkMessage>();
+        List<NetworkMessage> messages_for_game = new ArrayList<>();
         List<NetworkMessage> server_messages = connection.consumeMessages();
         for (NetworkMessage message : server_messages) {
+            if (!uuid.isEmpty()) {
+                if (!(message.isBroadcast() || message.getUUID().equalsIgnoreCase(uuid))) {
+                    continue;
+                }
+            }
             switch (message.getType()) {
-                case NetworkStatus -> {
+                case MessageType.NetworkStatus -> {
                     logger.info("Network Status: {}", message.getText());
                 }
-                case NewGame -> {
+                case MessageType.ClientUUID -> {
+                    uuid = message.getText();
+                    logger.info("Got UUID: {}", uuid);
+                }
+                case MessageType.NewGame -> {
+                    game_handler.stopGame();
+                    logger.info("Going to NewGame to: {}", message.getGame().toString());
+                    game_handler = GameHandlerFactory.createGameHandler(message.getGame(), io_handler, connection, uuid);
+                    game_handler.startGame();
+                }
+                case MessageType.GameStatus -> {
                     if (game_handler.getGame() != message.getGame()) {
                         game_handler.stopGame();
-                        logger.info("OMG let's switch games to: {}", message.getGame().toString());
-                        game_handler = GameHandlerFactory.createGameHandler(message.getGame(), io_handler, connection);
+                        logger.info("Switching Games to: {}", message.getGame().toString());
+                        game_handler = GameHandlerFactory.createGameHandler(message.getGame(), io_handler, connection, uuid);
                         game_handler.startGame();
+                    } else {
+                        //logger.info("Outputting routine message for GameStatus: {}", game_handler.getGame());
                     }
                 }
-                case PlayerEvent, PlayerStatus, GameStatus ->  {
-                    messages_for_game.add(message);
-                }
                 default -> {
-                    logger.error("Hmmm... Not yet implemented for this Type of message: {}", message.getType());
+                    messages_for_game.add(message);
                 }
             }
         }

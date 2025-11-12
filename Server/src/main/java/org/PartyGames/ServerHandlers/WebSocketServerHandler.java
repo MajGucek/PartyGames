@@ -1,6 +1,8 @@
 package org.PartyGames.ServerHandlers;
 
 
+import org.PartyGames.Client;
+import org.PartyGames.Networking.MessageType;
 import org.PartyGames.Networking.NetworkMessage;
 import org.PartyGames.Networking.NetworkMessageBuilder;
 import org.java_websocket.WebSocket;
@@ -17,36 +19,31 @@ import org.slf4j.LoggerFactory;
 
 public class WebSocketServerHandler extends WebSocketServer {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketServerHandler.class);
-    private final Object message_lock;
-    private final ConcurrentHashMap<WebSocket, ConcurrentLinkedQueue<String>> messages;
+    private final ConcurrentLinkedQueue<String> messages;
     public WebSocketServerHandler(int port) {
         super(new InetSocketAddress(port));
-        messages = new ConcurrentHashMap<WebSocket, ConcurrentLinkedQueue<String>>();
-        message_lock = new Object();
+        messages = new ConcurrentLinkedQueue<>();
     }
 
     @Override
-    public void onOpen(WebSocket client, ClientHandshake clientHandshake) {
-        logger.info("{} entered the room!", client.getRemoteSocketAddress().toString());
-        messages.put(client, new ConcurrentLinkedQueue<String>());
+    public void onOpen(WebSocket web_socket, ClientHandshake clientHandshake) {
+        logger.info("{} entered the room!", web_socket.getRemoteSocketAddress().toString());
+        Client client = new Client();
+        NetworkMessageBuilder builder = new NetworkMessageBuilder();
+        builder.setMessageType(MessageType.ClientUUID).setText(client.getUUID());
+        web_socket.send(builder.exportJSON());
+        logger.info("Assigned: {} : {}", web_socket.getRemoteSocketAddress().toString(), client.getUUID());
     }
 
     @Override
-    public void onClose(WebSocket client, int code, String reason, boolean remote) {
-        logger.info("{} has left the room!", client.getRemoteSocketAddress().toString());
-        messages.remove(client);
+    public void onClose(WebSocket web_socket, int code, String reason, boolean remote) {
+        logger.info("{} has left the room!", web_socket.getRemoteSocketAddress().toString());
     }
 
     @Override
-    public void onMessage(WebSocket client, String message) {
-        synchronized (message_lock) {
-            ConcurrentLinkedQueue<String> queue = messages.get(client);
-            if (queue == null) {
-                queue = new ConcurrentLinkedQueue<>();
-                messages.put(client, queue);
-            }
-            queue.add(message);
-        }
+    public void onMessage(WebSocket web_socket, String message) {
+        logger.info(message);
+        messages.add(message);
     }
 
     @Override
@@ -61,25 +58,32 @@ public class WebSocketServerHandler extends WebSocketServer {
     }
 
 
-    public Map<WebSocket, List<NetworkMessage>> consumeMessages() {
-        synchronized (message_lock) {
+    public List<NetworkMessage> consumeMessages() {
+        List<NetworkMessage> snapshot = new ArrayList<>();
+
+        synchronized (messages) {
             // synchronized is a blocking block {}
             // So, take snapshot, than remove everything out of the messages.
-            Map<WebSocket, List<NetworkMessage>> snapshot = new HashMap<WebSocket, List<NetworkMessage>>();
 
-            messages.forEach((client, queue) -> {
-                List<NetworkMessage> actions = new ArrayList<NetworkMessage>();
-                queue.forEach((action) -> {
-                    try {
-                        NetworkMessage message = NetworkMessageBuilder.parseNetworkMessage(action);
-                        actions.add(message);
-                    } catch (ParseException _) {}
-                });
-                snapshot.put(client, actions);
-                queue.clear();
+            messages.forEach((message) -> {
+                try {
+                    NetworkMessage data = NetworkMessageBuilder.parseNetworkMessage(message);
+                    snapshot.add(data);
+                } catch (ParseException e) {
+                    logger.error("Parse exception: {}", String.valueOf(e));
+                }
             });
+            messages.clear();
             return snapshot;
         }
+    }
+
+    public void notifyClients(NetworkMessage message) {
+        broadcast(NetworkMessageBuilder.parseString(message));
+    }
+
+    public void clearBuffer() {
+        messages.clear();
     }
 
 }

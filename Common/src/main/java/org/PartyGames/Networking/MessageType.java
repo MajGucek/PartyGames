@@ -2,10 +2,16 @@ package org.PartyGames.Networking;
 
 public enum MessageType {
     NetworkStatus,
-    PlayerStatus,
-    PlayerEvent,
     GameStatus,
     NewGame,
+    ClientStatus,
+    //
+    ClientEvent,
+    ClientError,
+    //
+    ClientName,
+    ClientDisconnect,
+    ClientUUID,
     Error,
     Invalid,
 }

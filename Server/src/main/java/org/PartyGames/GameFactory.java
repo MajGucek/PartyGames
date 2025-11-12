@@ -13,10 +13,10 @@ public class GameFactory {
         logger.warn("Please implement this function!");
         return Games.Lobby;
     }
-    public static GameStrategy createGame(Games state, WebSocketServerHandler ws_handler) {
+    public static GameStrategy createGame(Games state, WebSocketServerHandler connection) {
         switch (state) {
             case Lobby -> {
-                return new Lobby(ws_handler);
+                return new Lobby(connection);
             }
             default -> {
                 logger.error("WOW buddy, slow down, please DO register {}, in the GameFactory.createGame() method!", state);

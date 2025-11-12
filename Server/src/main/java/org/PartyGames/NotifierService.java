@@ -1,6 +1,5 @@
 package org.PartyGames;
 
-import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,7 +18,7 @@ public class NotifierService {
         executor = Executors.newSingleThreadScheduledExecutor();
         task = null;
     }
-    public void addNotification(@NotNull Runnable notification, int times_per_second) {
+    public void addNotification(Runnable notification, int times_per_second) {
         if (task != null) {
             throw new IllegalThreadStateException("Notifier service instance only accepts a single task!");
         } else {

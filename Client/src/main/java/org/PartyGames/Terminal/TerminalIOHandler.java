@@ -32,14 +32,6 @@ public class TerminalIOHandler {
         graphics = null;
     }
 
-    private Screen withScreen() throws IOException {
-        if (!started || screen == null) {
-            throw new IOException("Terminal has not started!");
-        } else {
-            return screen;
-        }
-    }
-
 
     public void start() {
         DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
@@ -47,32 +39,30 @@ public class TerminalIOHandler {
             Terminal terminal = defaultTerminalFactory.createTerminal();
             screen = new TerminalScreen(terminal);
             started = true;
-
-            withScreen().startScreen();
+            screen.startScreen();
             hideCursor();
-            graphics = withScreen().newTextGraphics();
-            //
+            graphics = screen.newTextGraphics();
         } catch (IOException e) {
-            logger.error(String.valueOf(e));
+            logger.error("Error starting: {}", String.valueOf(e));
         }
     }
 
 
     public void stop() {
         try {
-            withScreen().stopScreen();
+            screen.stopScreen();
             started = false;
         } catch (IOException e) {
-            logger.error(String.valueOf(e));
+            logger.error("Error stopping: {}", String.valueOf(e));
         }
     }
 
 
     public void clearScreen() {
-        try {
-            withScreen().clear();
-        } catch (IOException e) {
-            logger.error(String.valueOf(e));
+        if (screen != null) {
+            screen.clear();
+        } else {
+            logger.error("Cannot clear screen, because screen == null!");
         }
     }
 
@@ -90,37 +80,38 @@ public class TerminalIOHandler {
 
 
     public void hideCursor() {
-        try {
-            withScreen().setCursorPosition(null);
-        } catch (IOException e) {
-            logger.error(String.valueOf(e));
+        if (screen != null) {
+            screen.setCursorPosition(null);
+        } else {
+            logger.error("Cannot hide cursor, because screen == null!");
         }
     }
 
 
     public void setCursor(int x, int y) {
-        try {
-            withScreen().setCursorPosition(new TerminalPosition(x, y));
-        } catch (IOException e) {
-            logger.error(String.valueOf(e));
+        if (screen != null) {
+            screen.setCursorPosition(new TerminalPosition(x, y));
+        } else {
+            logger.error("Cannot set Cursor, because screen == null!");
         }
+
     }
 
 
     public void render() {
         try {
-            withScreen().refresh();
+            screen.refresh();
         } catch (IOException e) {
-            logger.error(String.valueOf(e));
+            logger.error("Error refreshing screen: {}", String.valueOf(e));
         }
     }
 
 
     public KeyStroke poll() {
         try {
-            return withScreen().readInput();
+            return screen.pollInput();
         } catch (IOException e) {
-            logger.error("Couldn't readInput");
+            logger.error("Error polling inputs: {}", String.valueOf(e));
         }
         return null;
     }

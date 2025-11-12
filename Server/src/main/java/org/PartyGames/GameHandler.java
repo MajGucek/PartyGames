@@ -13,42 +13,55 @@ public class GameHandler {
     private static final Logger logger = LoggerFactory.getLogger(GameHandler.class);
     private final WebSocketServerHandler connection;
     private GameStrategy game;
-    private final NotifierService notifier;
+    private long last_time_sent_game;
 
     public GameHandler(int port) {
         connection = new WebSocketServerHandler(port);
         game = GameFactory.createGame(Games.Lobby, connection);
-        notifier = new NotifierService();
+        last_time_sent_game = 0;
     }
-    private void reinstateNotification(Games game) {
-        notifier.shutdown();
+    private void notifyOfGameStrategy(Games game) {
         NetworkMessageBuilder message_builder = new NetworkMessageBuilder();
-        message_builder.setMessageType(MessageType.NewGame).setGame(game);
-        notifier.addNotification(() -> {
-            connection.broadcast(message_builder.exportJSON());
-        }, 1);
+        message_builder.setToBroadcast().setMessageType(MessageType.GameStatus).setGame(game).setText("Routine Game type message");
+        long now = System.currentTimeMillis();
+        if (now - last_time_sent_game >= 2000) {
+            connection.notifyClients(message_builder.exportMessage());
+            last_time_sent_game = now;
+        }
     }
 
     public void start() {
         connection.start();
         logger.info("Server started on port: {}", connection.getPort());
-
+        NetworkMessageBuilder builder = new NetworkMessageBuilder();
+        builder.setToBroadcast().setMessageType(MessageType.NewGame).setGame(game.getGame());
+        connection.notifyClients(builder.exportMessage());
         game.start();
-        reinstateNotification(game.getGame());
+        notifyOfGameStrategy(game.getGame());
     }
     public void update() {
-        game.handleGame();
         if (game.isFinished()) {
-            game.stop();
+            connection.consumeMessages();
+            connection.clearBuffer();
             logger.info("Finished with a game!");
 
+            NetworkMessageBuilder builder = new NetworkMessageBuilder();
+            builder.setToBroadcast().setMessageType(MessageType.NewGame).setGame(game.getGame());
+            connection.notifyClients(builder.exportMessage());
+
             game = GameFactory.createGame(GameFactory.getRandomGame(), connection);
+            if (game == null) {
+                logger.error("Error, null game");
+            }
+            logger.info("Created Game: {}", game.getGame());
             game.start();
-            reinstateNotification(game.getGame());
         }
+
+        game.handleGame(connection.consumeMessages());
+        notifyOfGameStrategy(game.getGame());
+
     }
     public void shutdown() {
-        notifier.shutdown();
         try {
             connection.stop(0, "Shutdown requested!");
         } catch (InterruptedException e) {

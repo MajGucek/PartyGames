@@ -11,8 +11,8 @@ import java.util.List;
 
 public class NullGame extends GameHandler {
     protected static final Logger logger = LoggerFactory.getLogger(NullGame.class);
-    public NullGame(TerminalIOHandler io_handler, WebSocketConnectionHandler connection) {
-        super(io_handler, connection);
+    public NullGame(TerminalIOHandler io_handler, WebSocketConnectionHandler connection, String uuid) {
+        super(io_handler, connection, uuid);
         logger.warn("You've instantiated a NullGame Object, Beware!");
     }
 

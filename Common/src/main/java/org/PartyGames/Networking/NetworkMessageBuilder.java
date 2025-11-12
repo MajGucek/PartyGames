@@ -21,6 +21,14 @@ public class NetworkMessageBuilder {
         network_message.setGame(game);
         return this;
     }
+    public NetworkMessageBuilder setUUID(String uuid) {
+        network_message.setUUID(uuid);
+        return this;
+    }
+    public NetworkMessageBuilder setToBroadcast() {
+        network_message.setUUID("broadcast");
+        return this;
+    }
 
     public static NetworkMessage parseNetworkMessage(String message) throws ParseException {
         NetworkMessage parsed = gson.fromJson(message, NetworkMessage.class);

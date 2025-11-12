@@ -28,7 +28,7 @@ Vse kar potrebujete, je implementacija dveh razredov: enega na **Server** strani
 - Razred mora extendati **GameStrategy** abstract class in implementirati:
 
   - Constructor matching super + Optional dodatni parametri  
-  - `handleGame()`  
+  - `handleGame(List<NetworkMessage>)`  
   - `getGame()`
 
 - Novo igro registrirajte v:  

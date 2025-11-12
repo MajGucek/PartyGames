@@ -2,10 +2,14 @@ package org.PartyGames.Networking;
 
 import org.PartyGames.Shared.Games;
 
+/** The underlying data that gets sent over the WebSocket */
 public class NetworkMessage {
     private MessageType type;
+    /** Send value with this */
     private String text;
+    /** If you're sending a NewGame use this */
     private Games game;
+    /** Address */
     private String uuid;
     public NetworkMessage() {
         type = MessageType.Invalid;

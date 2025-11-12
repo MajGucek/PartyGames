@@ -5,6 +5,9 @@ import org.PartyGames.Shared.Games;
 
 import java.text.ParseException;
 
+/**
+ * The Class Responsible for building a NetworkMessage object, step by step.
+ * */
 public class NetworkMessageBuilder {
     private final NetworkMessage network_message;
     private static final Gson gson = new Gson();
@@ -35,7 +38,7 @@ public class NetworkMessageBuilder {
         if (parsed != null) {
             return parsed;
         } else {
-            throw new ParseException("Your String was not formatted correctly, kys!", 0);
+            throw new ParseException("Your String was not formatted correctly", 0);
         }
     }
     public static String parseString(NetworkMessage message) {

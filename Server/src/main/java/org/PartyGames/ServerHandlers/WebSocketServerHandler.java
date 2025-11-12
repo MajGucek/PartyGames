@@ -11,14 +11,18 @@ import org.java_websocket.server.WebSocketServer;
 import java.net.InetSocketAddress;
 import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The class that manages the WebSocket connection
+ * It wraps a couple of methods and just abstracts away the implementation
+ */
 public class WebSocketServerHandler extends WebSocketServer {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketServerHandler.class);
+    /** The Thread-insensitive message queue */
     private final ConcurrentLinkedQueue<String> messages;
     public WebSocketServerHandler(int port) {
         super(new InetSocketAddress(port));
@@ -28,11 +32,11 @@ public class WebSocketServerHandler extends WebSocketServer {
     @Override
     public void onOpen(WebSocket web_socket, ClientHandshake clientHandshake) {
         logger.info("{} entered the room!", web_socket.getRemoteSocketAddress().toString());
-        Client client = new Client();
         NetworkMessageBuilder builder = new NetworkMessageBuilder();
-        builder.setMessageType(MessageType.ClientUUID).setText(client.getUUID());
+        String uuid = Client.getUUID();
+        builder.setMessageType(MessageType.ClientUUID).setText(uuid);
         web_socket.send(builder.exportJSON());
-        logger.info("Assigned: {} : {}", web_socket.getRemoteSocketAddress().toString(), client.getUUID());
+        logger.info("Assigned: {} : {}", web_socket.getRemoteSocketAddress().toString(), uuid);
     }
 
     @Override
@@ -42,7 +46,6 @@ public class WebSocketServerHandler extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket web_socket, String message) {
-        logger.info(message);
         messages.add(message);
     }
 

@@ -2,12 +2,11 @@ package org.PartyGames;
 
 import com.fasterxml.uuid.Generators;
 
-import java.util.UUID;
-
+/**
+ * Helper class for UUID of Clients
+ */
 public class Client {
-    private final UUID uuid;
-    public Client() {
-        this.uuid = Generators.defaultTimeBasedGenerator().generate();
+    public static String getUUID() {
+        return Generators.defaultTimeBasedGenerator().generate().toString();
     }
-    public String getUUID() { return this.uuid.toString(); }
 }

@@ -9,6 +9,7 @@ import java.util.concurrent.*;
 public class Main {
     public static void main(String[] args) {
 
+
         String server_address = "ws://localhost:8887";
         WebSocketConnectionHandler connection_handler = new WebSocketConnectionHandler(server_address);
         TerminalIOHandler io_handler = new TerminalIOHandler();

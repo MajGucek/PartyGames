@@ -6,6 +6,7 @@ import org.PartyGames.GameHandlers.GameHandler;
 import org.PartyGames.GameHandlers.GameHandlerFactory;
 import org.PartyGames.Networking.MessageType;
 import org.PartyGames.Networking.NetworkMessage;
+import org.PartyGames.Networking.NetworkMessageBuilder;
 import org.PartyGames.Shared.Games;
 
 import java.util.ArrayList;
@@ -53,6 +54,10 @@ public class TerminalClient {
         checkConnectionTryReconnect();
         List<NetworkMessage> messages_for_game = new ArrayList<>();
         List<NetworkMessage> server_messages = connection.consumeMessages();
+        if (server_messages == null) {
+            checkConnectionTryReconnect();
+            return;
+        }
         for (NetworkMessage message : server_messages) {
             if (!uuid.isEmpty()) {
                 if (!(message.isBroadcast() || message.getUUID().equalsIgnoreCase(uuid))) {
@@ -80,13 +85,14 @@ public class TerminalClient {
                         game_handler = GameHandlerFactory.createGameHandler(message.getGame(), io_handler, connection, uuid);
                         game_handler.startGame();
                     } else {
-                        //logger.info("Outputting routine message for GameStatus: {}", game_handler.getGame());
+                        // everything is ok, game is set correctly, respond back to server.
+                        NetworkMessageBuilder builder = new NetworkMessageBuilder();
+                        builder.setUUID(uuid).setMessageType(MessageType.ClientStatus).setText("ACK");
+                        connection.send(builder.exportMessage());
                     }
                 }
-                default -> {
-                    messages_for_game.add(message);
-                }
             }
+            messages_for_game.add(message);
         }
         game_handler.handleGame(messages_for_game);
     }

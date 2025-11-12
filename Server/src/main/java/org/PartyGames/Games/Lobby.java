@@ -72,12 +72,15 @@ public class Lobby extends GameStrategy {
                     }
                 }
                 case MessageType.ClientStatus -> {
-                    // Client-side isn't implemented yet
                     String name = client_names.get(client_id);
                     if (name != null) {
-                        logger.info("Client: {}, has acknowledged our game", name);
+                        if (action.getText().equals("ACK")) {
+                            //logger.info("Client: {}, has acknowledged our game", name);
+                        } else {
+                            logger.warn("Unexpected! Client sent ClientStatus with: {}", action);
+                        }
                     } else {
-                        logger.error("This Client: {} is not registered in client_names", client_id);
+                        // Client has acknowledged our Game, but hasn't sent their name, or Map ID->Name doesn't exist
                     }
                 }
                 case MessageType.ClientEvent -> {

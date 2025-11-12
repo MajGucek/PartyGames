@@ -6,6 +6,7 @@ import org.PartyGames.Networking.NetworkMessage;
 import org.PartyGames.Networking.NetworkMessageBuilder;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
@@ -47,11 +48,23 @@ public class WebSocketConnectionHandler extends WebSocketClient {
 
     public void restart() {
         logger.warn("Restarting connection!");
+        try {
+            closeBlocking();
+        } catch (InterruptedException e) {
+            logger.error("closeBlocking() Error: {}", String.valueOf(e));
+        }
+
         synchronized (server_messages) {
             server_messages.clear();
         }
         is_connected = false;
-        reconnect();
+
+        try {
+            connectBlocking();
+            logger.info("Reconnected to the server!");
+        } catch (InterruptedException e) {
+            logger.error("Failed to reconnect: {}", String.valueOf(e));
+        }
     }
 
 
@@ -64,7 +77,7 @@ public class WebSocketConnectionHandler extends WebSocketClient {
     }
 
 
-    public List<NetworkMessage> consumeMessages() {
+    public List<NetworkMessage> consumeMessages() throws WebsocketNotConnectedException {
         if (!isConnected()) {
             logger.error("The Client isn't connected to the server!");
             is_connected = false;
@@ -92,8 +105,9 @@ public class WebSocketConnectionHandler extends WebSocketClient {
         try {
             NetworkMessage message = NetworkMessageBuilder.parseNetworkMessage(data);
             server_messages.add(message);
+        } catch (ParseException e) {
+          logger.error("Parse Error: {}", String.valueOf(e));
         }
-        catch (ParseException _) {}
     }
 
     @Override

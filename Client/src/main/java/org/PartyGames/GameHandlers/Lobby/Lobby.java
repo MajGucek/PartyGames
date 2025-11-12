@@ -1,8 +1,9 @@
-package org.PartyGames.GameHandlers;
+package org.PartyGames.GameHandlers.Lobby;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import org.PartyGames.ConnectionHandlers.WebSocketConnectionHandler;
+import org.PartyGames.GameHandlers.GameHandler;
 import org.PartyGames.Networking.MessageType;
 import org.PartyGames.Networking.NetworkMessage;
 import org.PartyGames.Networking.NetworkMessageBuilder;
@@ -14,13 +15,13 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class Lobby extends GameHandler {
+    private static final Logger logger = LoggerFactory.getLogger(Lobby.class);
     private String unconfirmed_name;
     private String confirmed_name;
     private boolean has_sent_name;
     private boolean is_name_registered;
     private boolean was_name_denied;
     private boolean vote_start_games;
-    protected static final Logger logger = LoggerFactory.getLogger(Lobby.class);
     public Lobby(TerminalIOHandler io_handler, WebSocketConnectionHandler connection, String uuid) {
         super(io_handler, connection, uuid);
         this.unconfirmed_name = "";
@@ -32,12 +33,12 @@ public class Lobby extends GameHandler {
     }
 
     @Override
-    public void startGame() {
+    public void start() {
         logger.info("Entered Lobby!");
     }
 
     @Override
-    public void stopGame() {
+    public void stop() {
         logger.info("Exiting Lobby!");
     }
     private void processServerMessages(List<NetworkMessage> server_messages) {

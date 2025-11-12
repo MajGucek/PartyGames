@@ -18,10 +18,10 @@ public abstract class GameHandler {
         this.connection = connection;
         this.uuid = uuid;
     }
-    public void startGame() {
+    public void start() {
         io_handler.clearScreen();
     }
-    public void stopGame() {
+    public void stop() {
         io_handler.clearScreen();
     }
 

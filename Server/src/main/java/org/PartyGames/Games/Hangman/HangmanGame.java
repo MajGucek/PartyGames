@@ -29,6 +29,6 @@ public class HangmanGame extends GameStrategy {
 
     @Override
     public Games getGame() {
-        return null;
+        return Games.Hangman;
     }
 }

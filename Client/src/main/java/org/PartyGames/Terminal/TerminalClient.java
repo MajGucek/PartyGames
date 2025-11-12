@@ -3,7 +3,7 @@ package org.PartyGames.Terminal;
 
 import org.PartyGames.ConnectionHandlers.WebSocketConnectionHandler;
 import org.PartyGames.GameHandlers.GameHandler;
-import org.PartyGames.GameHandlers.GameHandlerFactory;
+import org.PartyGames.GameHandlers.GameFactory;
 import org.PartyGames.Networking.MessageType;
 import org.PartyGames.Networking.NetworkMessage;
 import org.PartyGames.Networking.NetworkMessageBuilder;
@@ -28,7 +28,7 @@ public class TerminalClient {
         last_reconnect_attempt = 0;
         this.io_handler = io_handler;
         this.connection = connection_handler;
-        this.game_handler = GameHandlerFactory.createGameHandler(Games.Null, io_handler, connection, uuid);
+        this.game_handler = GameFactory.createGameHandler(Games.Null, io_handler, connection, uuid);
 
     }
 
@@ -46,7 +46,7 @@ public class TerminalClient {
     public void start() {
         connection.start();
         io_handler.start();
-        game_handler.startGame();
+        game_handler.start();
     }
 
 
@@ -74,18 +74,18 @@ public class TerminalClient {
                 }
                 case MessageType.NewGame -> {
                     if (message.getGame() != game_handler.getGame()) {
-                        game_handler.stopGame();
+                        game_handler.stop();
                         logger.info("Going to NewGame to: {}", message.getGame().toString());
-                        game_handler = GameHandlerFactory.createGameHandler(message.getGame(), io_handler, connection, uuid);
-                        game_handler.startGame();
+                        game_handler = GameFactory.createGameHandler(message.getGame(), io_handler, connection, uuid);
+                        game_handler.start();
                     }
                 }
                 case MessageType.GameStatus -> {
                     if (game_handler.getGame() != message.getGame()) {
-                        game_handler.stopGame();
+                        game_handler.stop();
                         logger.info("Switching Games to: {}", message.getGame().toString());
-                        game_handler = GameHandlerFactory.createGameHandler(message.getGame(), io_handler, connection, uuid);
-                        game_handler.startGame();
+                        game_handler = GameFactory.createGameHandler(message.getGame(), io_handler, connection, uuid);
+                        game_handler.start();
                     } else {
                         // everything is ok, game is set correctly, respond back to server.
                         NetworkMessageBuilder builder = new NetworkMessageBuilder();
@@ -101,7 +101,7 @@ public class TerminalClient {
 
 
     public void shutdown() {
-        game_handler.stopGame();
+        game_handler.stop();
         connection.stop();
         io_handler.stop();
         logger.info("Shutdown Terminal Client!");

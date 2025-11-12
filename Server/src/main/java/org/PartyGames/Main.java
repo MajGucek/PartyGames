@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
-        int port = 8886;
+        int port = 8887;
         GameHandler game = new GameHandler(port);
         game.start();
         try {

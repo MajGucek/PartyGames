@@ -24,7 +24,8 @@ Vse kar potrebujete, je implementacija dveh razredov: enega na **Server** strani
 
 ### Server Side
 
-- Package: `Server:org.PartyGames.Games`  
+- Package: `Server:org.PartyGames.Games`
+- Ustvariš nov package Z imenom Igre
 - Razred mora extendati **GameStrategy** abstract class in implementirati:
 
   - Constructor matching super + Optional dodatni parametri  
@@ -41,7 +42,8 @@ Vse kar potrebujete, je implementacija dveh razredov: enega na **Server** strani
 
 ### Client Side
 
-- Package: `Client:org.PartyGames.GameHandlers`  
+- Package: `Client:org.PartyGames.GameHandlers`
+- Ustvariš nov package Z imenom Igre
 - Razred mora extendati **GameHandler** abstract class in implementirati:
 
   - Constructor matching super + Optional dodatni parametri  

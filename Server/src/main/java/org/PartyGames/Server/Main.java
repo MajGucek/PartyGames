@@ -1,7 +1,5 @@
 package org.PartyGames.Server;
 
-import org.PartyGames.Server.Games.GameHandler;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -9,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 public class Main {
     public static void main(String[] args) {
         int port = 8887;
-        GameHandler game = new GameHandler(port);
+        ServerController game = new ServerController(port);
         game.start();
         try {
             Thread.sleep(2000);

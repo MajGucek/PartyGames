@@ -1,17 +1,18 @@
-package org.PartyGames.Client.GameHandlers;
+package org.PartyGames.Client.Games.NullGame;
 
-import org.PartyGames.Client.ConnectionHandlers.WebSocketConnectionHandler;
+import org.PartyGames.Client.Connections.WebSocketConnection;
+import org.PartyGames.Client.Games.GameClientController;
 import org.PartyGames.Common.Networking.NetworkMessage;
 import org.PartyGames.Common.Shared.Games;
-import org.PartyGames.Client.Terminal.TerminalIOHandler;
+import org.PartyGames.Client.Terminal.IOController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class NullGame extends GameHandler {
+public class NullGame extends GameClientController {
     protected static final Logger logger = LoggerFactory.getLogger(NullGame.class);
-    public NullGame(TerminalIOHandler io_handler, WebSocketConnectionHandler connection, String uuid) {
+    public NullGame(IOController io_handler, WebSocketConnection connection, String uuid) {
         super(io_handler, connection, uuid);
         logger.warn("You've instantiated a NullGame Object, Beware!");
     }

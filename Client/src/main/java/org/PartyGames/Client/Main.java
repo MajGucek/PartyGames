@@ -1,18 +1,16 @@
 package org.PartyGames.Client;
 
-import org.PartyGames.Client.ConnectionHandlers.WebSocketConnectionHandler;
-import org.PartyGames.Client.Terminal.TerminalClient;
-import org.PartyGames.Client.Terminal.TerminalIOHandler;
-import org.PartyGames.Common.Shared.Games;
+import org.PartyGames.Client.Connections.WebSocketConnection;
+import org.PartyGames.Client.Terminal.IOController;
 
 import java.util.concurrent.*;
 
 public class Main {
-    public static void main(String[] args) {
+    static void main() {
         String server_address = "ws://localhost:8887";
-        WebSocketConnectionHandler connection_handler = new WebSocketConnectionHandler(server_address);
-        TerminalIOHandler io_handler = new TerminalIOHandler();
-        TerminalClient client = new TerminalClient(connection_handler, io_handler);
+        WebSocketConnection connection_handler = new WebSocketConnection(server_address);
+        IOController io_handler = new IOController();
+        ClientController client = new ClientController(connection_handler, io_handler);
 
         client.start();
 

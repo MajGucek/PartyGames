@@ -18,17 +18,15 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TerminalIOHandler {
-    private static final Logger logger = LoggerFactory.getLogger(TerminalIOHandler.class);
+public class IOController {
+    private static final Logger logger = LoggerFactory.getLogger(IOController.class);
     // This is purely for rendering,
     private Screen screen;
     // modify "graphics" and then render the whole thing with screen.refresh()
     private TextGraphics graphics;
-    private boolean started;
 
-    public TerminalIOHandler() {
+    public IOController() {
         screen = null;
-        started = false;
         graphics = null;
     }
 
@@ -38,7 +36,6 @@ public class TerminalIOHandler {
         try {
             Terminal terminal = defaultTerminalFactory.createTerminal();
             screen = new TerminalScreen(terminal);
-            started = true;
             screen.startScreen();
             hideCursor();
             graphics = screen.newTextGraphics();
@@ -51,7 +48,6 @@ public class TerminalIOHandler {
     public void stop() {
         try {
             screen.stopScreen();
-            started = false;
         } catch (IOException e) {
             logger.error("Error stopping: {}", String.valueOf(e));
         }

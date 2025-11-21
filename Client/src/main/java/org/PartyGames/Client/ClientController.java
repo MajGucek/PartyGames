@@ -1,9 +1,10 @@
-package org.PartyGames.Client.Terminal;
+package org.PartyGames.Client;
 
 
-import org.PartyGames.Client.ConnectionHandlers.WebSocketConnectionHandler;
-import org.PartyGames.Client.GameHandlers.GameHandler;
-import org.PartyGames.Client.GameHandlers.GameFactory;
+import org.PartyGames.Client.Connections.WebSocketConnection;
+import org.PartyGames.Client.Games.GameClientController;
+import org.PartyGames.Client.Games.GameFactory;
+import org.PartyGames.Client.Terminal.IOController;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
 import org.PartyGames.Common.Shared.Games;
@@ -14,15 +15,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TerminalClient {
-    private static final Logger logger = LoggerFactory.getLogger(TerminalClient.class);
+public class ClientController {
+    private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
     private String uuid;
     private long last_reconnect_attempt;
-    private final TerminalIOHandler io_handler;
-    private final WebSocketConnectionHandler connection;
-    private GameHandler game_handler;
+    private final IOController io_handler;
+    private final WebSocketConnection connection;
+    private GameClientController game_handler;
 
-    public TerminalClient(WebSocketConnectionHandler connection_handler, TerminalIOHandler io_handler) {
+    public ClientController(WebSocketConnection connection_handler, IOController io_handler) {
         this.uuid = "";
         last_reconnect_attempt = 0;
         this.io_handler = io_handler;

@@ -1,7 +1,7 @@
 package org.PartyGames.Server.Games;
 
 import org.PartyGames.Common.Networking.NetworkMessage;
-import org.PartyGames.Server.ServerHandlers.WebSocketServerHandler;
+import org.PartyGames.Server.Connections.WebSocketServer;
 import org.PartyGames.Common.Shared.Games;
 import java.util.List;
 
@@ -14,14 +14,14 @@ import java.util.List;
  * Under Lifecycle, clean and install. That will recompile the Common module.
  */
 
-public abstract class GameStrategy {
+public abstract class GameServerController {
     /** This variable represents the state of the server */
-    protected WebSocketServerHandler connection;
+    protected WebSocketServer connection;
     protected boolean is_finished;
     /**
      * In the concrete subclasses you must call this super constructor.
      */
-    public GameStrategy(WebSocketServerHandler connection) {
+    public GameServerController(WebSocketServer connection) {
         this.connection = connection;
         is_finished = false;
     }

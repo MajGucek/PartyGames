@@ -1,25 +1,27 @@
-package org.PartyGames.Server.Games;
+package org.PartyGames.Server;
 
 import org.PartyGames.Common.Networking.*;
 import org.PartyGames.Common.Shared.Games;
-import org.PartyGames.Server.ServerHandlers.WebSocketServerHandler;
+import org.PartyGames.Server.Connections.WebSocketServer;
 
+import org.PartyGames.Server.Games.GameFactory;
+import org.PartyGames.Server.Games.GameServerController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * The Main Class that is responsible for switching Games and game looping
  */
-public class GameHandler {
-    private static final Logger logger = LoggerFactory.getLogger(GameHandler.class);
-    private final WebSocketServerHandler connection;
+public class ServerController {
+    private static final Logger logger = LoggerFactory.getLogger(ServerController.class);
+    private final WebSocketServer connection;
     /** A Game instance, notice how it's the Abstract class, because of the Factory*/
-    private GameStrategy game;
+    private GameServerController game;
     /** The last time I've sent a GameState message */
     private long last_time_sent_game;
 
-    public GameHandler(int port) {
-        connection = new WebSocketServerHandler(port);
+    public ServerController(int port) {
+        connection = new WebSocketServer(port);
         game = GameFactory.createGame(Games.Lobby, connection);
         last_time_sent_game = 0;
     }
@@ -49,8 +51,6 @@ public class GameHandler {
             connection.consumeMessages();
             connection.clearBuffer();
             logger.info("Finished with a game!");
-
-
 
             game = GameFactory.createGame(GameFactory.getRandomGame(), connection);
             if (game == null) {

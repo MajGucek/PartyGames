@@ -1,11 +1,11 @@
-package org.PartyGames.Server.ServerHandlers;
+package org.PartyGames.Server.Connections;
 
 
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.server.WebSocketServer;
+
 import java.net.InetSocketAddress;
 import java.text.ParseException;
 import java.util.*;
@@ -18,11 +18,11 @@ import org.slf4j.LoggerFactory;
  * The class that manages the WebSocket connection
  * It wraps a couple of methods and just abstracts away the implementation
  */
-public class WebSocketServerHandler extends WebSocketServer {
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketServerHandler.class);
+public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketServer.class);
     /** The Thread-insensitive message queue */
     private final ConcurrentLinkedQueue<String> messages;
-    public WebSocketServerHandler(int port) {
+    public WebSocketServer(int port) {
         super(new InetSocketAddress(port));
         messages = new ConcurrentLinkedQueue<>();
     }

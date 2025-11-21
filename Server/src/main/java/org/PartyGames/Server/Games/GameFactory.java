@@ -2,7 +2,7 @@ package org.PartyGames.Server.Games;
 
 
 import org.PartyGames.Server.Games.Lobby.Lobby;
-import org.PartyGames.Server.ServerHandlers.WebSocketServerHandler;
+import org.PartyGames.Server.Connections.WebSocketServer;
 import org.PartyGames.Common.Shared.Games;
 
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,14 @@ public class GameFactory {
         Games[] playable = Arrays.stream(values)
                 .filter(g -> g != Games.Null && g != Games.Lobby)
                 .toArray(Games[]::new);
-        return playable[random.nextInt(playable.length)];
+        if (playable.length == 0) {
+            logger.error("No other Games to create!");
+            throw new AssertionError("No playable games available!");
+        }
+
+        Games rnd = playable[random.nextInt(playable.length)];
+        logger.info("Creating game: {}", rnd.toString());
+        return rnd;
     }
     /**
      * Create a game
@@ -33,7 +40,7 @@ public class GameFactory {
      * @param connection A WebSocket connection
      * @return A new GameStrategy concrete Class
      */
-    public static GameStrategy createGame(Games state, WebSocketServerHandler connection) {
+    public static GameServerController createGame(Games state, WebSocketServer connection) {
         switch (state) {
             case Lobby -> {
                 return new Lobby(connection);

@@ -1,9 +1,9 @@
 package org.PartyGames.Server.Games.Lobby;
 
-import org.PartyGames.Server.Games.GameStrategy;
+import org.PartyGames.Server.Games.GameServerController;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
-import org.PartyGames.Server.ServerHandlers.*;
+import org.PartyGames.Server.Connections.*;
 import org.PartyGames.Common.Shared.Games;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import java.util.*;
 /**
  * This is the Lobby game class.
  */
-public class Lobby extends GameStrategy {
+public class Lobby extends GameServerController {
     private static final Logger logger = LoggerFactory.getLogger(Lobby.class);
     /** Map: Client-ID -> Client-Name */
     private final Map<String, String> client_names;
@@ -20,7 +20,7 @@ public class Lobby extends GameStrategy {
     private final Map<String, Boolean> client_votes;
 
     /** Call super constructor and initialize both internal Maps */
-    public Lobby(WebSocketServerHandler connection) {
+    public Lobby(WebSocketServer connection) {
         super(connection);
         client_names = new HashMap<>();
         client_votes = new HashMap<>();

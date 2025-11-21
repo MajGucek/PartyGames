@@ -1,4 +1,4 @@
-package org.PartyGames.Client.ConnectionHandlers;
+package org.PartyGames.Client.Connections;
 
 
 import org.PartyGames.Common.Networking.MessageType;
@@ -17,12 +17,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WebSocketConnectionHandler extends WebSocketClient {
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketConnectionHandler.class);
+public class WebSocketConnection extends WebSocketClient {
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketConnection.class);
     private final List<NetworkMessage> server_messages;
     private volatile boolean is_connected = false;
 
-    public WebSocketConnectionHandler(String server_address) {
+    public WebSocketConnection(String server_address) {
         super(URI.create(server_address), new Draft_6455());
         server_messages = Collections.synchronizedList(new ArrayList<>());
     }
@@ -85,7 +85,7 @@ public class WebSocketConnectionHandler extends WebSocketClient {
         }
 
         synchronized (server_messages) {
-            List<NetworkMessage> clone = new ArrayList<NetworkMessage>(server_messages);
+            List<NetworkMessage> clone = new ArrayList<>(server_messages);
             server_messages.clear();
             return clone;
         }

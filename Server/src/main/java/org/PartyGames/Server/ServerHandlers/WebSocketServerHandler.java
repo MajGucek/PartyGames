@@ -3,7 +3,6 @@ package org.PartyGames.Server.ServerHandlers;
 
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
-import org.PartyGames.Common.Networking.NetworkMessageBuilder;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -31,10 +30,10 @@ public class WebSocketServerHandler extends WebSocketServer {
     @Override
     public void onOpen(WebSocket web_socket, ClientHandshake clientHandshake) {
         logger.info("{} entered the room!", web_socket.getRemoteSocketAddress().toString());
-        NetworkMessageBuilder builder = new NetworkMessageBuilder();
+        NetworkMessage message = new NetworkMessage();
         String uuid = Client.getUUID();
-        builder.setMessageType(MessageType.ClientUUID).setText(uuid);
-        web_socket.send(builder.exportJSON());
+        message.setMessageType(MessageType.ClientUUID).setData(uuid);
+        web_socket.send(message.toString());
         logger.info("Assigned: {} : {}", web_socket.getRemoteSocketAddress().toString(), uuid);
     }
 
@@ -69,7 +68,7 @@ public class WebSocketServerHandler extends WebSocketServer {
 
             messages.forEach((message) -> {
                 try {
-                    NetworkMessage data = NetworkMessageBuilder.parseNetworkMessage(message);
+                    NetworkMessage data = NetworkMessage.fromString(message);
                     snapshot.add(data);
                 } catch (ParseException e) {
                     logger.error("Parse exception: {}", String.valueOf(e));
@@ -81,7 +80,7 @@ public class WebSocketServerHandler extends WebSocketServer {
     }
 
     public void notifyClients(NetworkMessage message) {
-        broadcast(NetworkMessageBuilder.parseString(message));
+        broadcast(message.toString());
     }
 
     public void clearBuffer() {

@@ -31,7 +31,7 @@ public class GameFactory {
      * Create a game
      * @param state The Games enum value
      * @param connection A WebSocket connection
-     * @return A new GameStratey concrete Class
+     * @return A new GameStrategy concrete Class
      */
     public static GameStrategy createGame(Games state, WebSocketServerHandler connection) {
         switch (state) {

@@ -3,7 +3,6 @@ package org.PartyGames.Client.ConnectionHandlers;
 
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
-import org.PartyGames.Common.Networking.NetworkMessageBuilder;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
@@ -33,7 +32,7 @@ public class WebSocketConnectionHandler extends WebSocketClient {
         if (!isConnected()) {
             logger.warn("No connection established");
         }
-        super.send(NetworkMessageBuilder.parseString(data));
+        super.send(data.toString());
     }
 
     public void start() {
@@ -94,16 +93,16 @@ public class WebSocketConnectionHandler extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
-        NetworkMessageBuilder builder = new NetworkMessageBuilder();
-        builder.setMessageType(MessageType.NetworkStatus).setText("Connected to server!");
-        server_messages.add(builder.exportMessage());
+        NetworkMessage message = new NetworkMessage();
+        message.setMessageType(MessageType.NetworkStatus).setData("Connected to server!");
+        server_messages.add(message);
         is_connected = true;
     }
 
     @Override
     public void onMessage(String data) {
         try {
-            NetworkMessage message = NetworkMessageBuilder.parseNetworkMessage(data);
+            NetworkMessage message = NetworkMessage.fromString(data);
             server_messages.add(message);
         } catch (ParseException e) {
           logger.error("Parse Error: {}", String.valueOf(e));
@@ -112,21 +111,21 @@ public class WebSocketConnectionHandler extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        NetworkMessageBuilder builder = new NetworkMessageBuilder();
+        NetworkMessage message = new NetworkMessage();
         if (code == -1) {
             //server_messages.add(Pair.with(MessageType.ConnectionStatus, "Waiting for connection!"));
         } else {
-            builder.setMessageType(MessageType.NetworkStatus).setText("Connection Closed!");
-            server_messages.add(builder.exportMessage());
+            message.setMessageType(MessageType.NetworkStatus).setData("Connection Closed!");
+            server_messages.add(message);
         }
         is_connected = false;
     }
 
     @Override
     public void onError(Exception e) {
-        NetworkMessageBuilder builder = new NetworkMessageBuilder();
-        builder.setMessageType(MessageType.NetworkStatus).setText("Error: " + e);
-        server_messages.add(builder.exportMessage());
+        NetworkMessage message = new NetworkMessage();
+        message.setMessageType(MessageType.NetworkStatus).setData("Error: " + e);
+        server_messages.add(message);
         is_connected = false;
     }
 

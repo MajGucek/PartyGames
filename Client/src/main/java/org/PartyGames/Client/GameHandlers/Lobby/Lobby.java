@@ -6,7 +6,6 @@ import org.PartyGames.Client.ConnectionHandlers.WebSocketConnectionHandler;
 import org.PartyGames.Client.GameHandlers.GameHandler;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
-import org.PartyGames.Common.Networking.NetworkMessageBuilder;
 import org.PartyGames.Common.Shared.Games;
 import org.PartyGames.Client.Terminal.TerminalIOHandler;
 import org.slf4j.Logger;
@@ -46,13 +45,18 @@ public class Lobby extends GameHandler {
             io_handler.clearScreen();
             return;
         }
-         for (NetworkMessage message : server_messages) {
-             switch (message.getType()) {
+         for (NetworkMessage action : server_messages) {
+             MessageType message_type = action.getMessageType();
+             if (message_type.equals(MessageType.Invalid)) { continue; }
+
+             switch (message_type) {
                  case MessageType.ClientName -> {
+                     String data = action.getData();
+                     if (data == null) { continue; }
                      // unconfirmed_name was accepted
                      logger.info("Name was accepted");
                      is_name_registered = true;
-                     confirmed_name = message.getText();
+                     confirmed_name = data;
                  }
                  case MessageType.ClientError -> {
                      logger.info("Name was denied!");
@@ -83,19 +87,19 @@ public class Lobby extends GameHandler {
                         unconfirmed_name = string_builder.toString();
                     }
                     if (is_name_registered) {
-                        NetworkMessageBuilder vote = new NetworkMessageBuilder();
+                        NetworkMessage vote = new NetworkMessage();
 
-                        vote.setUUID(uuid).setMessageType(MessageType.ClientEvent);
+                        vote.setAddress(uuid).setMessageType(MessageType.ClientEvent);
 
                         if (input.getCharacter().equals('y')) {
-                            vote.setText("Y");
+                            vote.setData("Y");
 
-                            connection.send(vote.exportMessage());
+                            connection.send(vote);
 
                             vote_start_games = true;
                         } else if (input.getCharacter().equals('n')) {
-                            vote.setText("N");
-                            connection.send(vote.exportMessage());
+                            vote.setData("N");
+                            connection.send(vote);
                             vote_start_games = false;
                         }
                     }
@@ -111,12 +115,12 @@ public class Lobby extends GameHandler {
                 case KeyType.Enter -> {
                     if (input.getKeyType() == KeyType.Enter) {
                         if (!has_sent_name) {
-                            NetworkMessageBuilder builder = new NetworkMessageBuilder();
-                            builder.setUUID(uuid).setMessageType(MessageType.ClientName);
+                            NetworkMessage message = new NetworkMessage();
+                            message.setAddress(uuid).setMessageType(MessageType.ClientName);
                             has_sent_name = true;
-                            builder.setText(unconfirmed_name);
-                            connection.send(builder.exportJSON());
-                            logger.info("Sent: {}", builder.exportJSON());
+                            message.setData(unconfirmed_name);
+                            connection.send(message);
+                            logger.info("Sent: {}", message);
                         }
                         if (was_name_denied) {
                             unconfirmed_name = "";

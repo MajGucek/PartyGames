@@ -1,9 +1,8 @@
 package org.PartyGames.Server.Games;
 
-import org.PartyGames.Common.Networking.MessageType;
-import org.PartyGames.Common.Networking.NetworkMessageBuilder;
-import org.PartyGames.Server.ServerHandlers.WebSocketServerHandler;
+import org.PartyGames.Common.Networking.*;
 import org.PartyGames.Common.Shared.Games;
+import org.PartyGames.Server.ServerHandlers.WebSocketServerHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +25,11 @@ public class GameHandler {
     }
     /** Helper method to notify Clients of the current Game going on */
     private void notifyOfGameStrategy(Games game) {
-        NetworkMessageBuilder message_builder = new NetworkMessageBuilder();
-        message_builder.setToBroadcast().setMessageType(MessageType.GameStatus).setGame(game).setText("Routine Game type message");
+        NetworkMessage message = new NetworkMessage();
+        message.setToBroadcast().setMessageType(MessageType.GameStatus).setGame(game).setData("Routine Game type message");
         long now = System.currentTimeMillis();
         if (now - last_time_sent_game >= 2000) {
-            connection.notifyClients(message_builder.exportMessage());
+            connection.notifyClients(message);
             last_time_sent_game = now;
         }
     }
@@ -38,9 +37,9 @@ public class GameHandler {
     public void start() {
         connection.start();
         logger.info("Server started on port: {}", connection.getPort());
-        NetworkMessageBuilder builder = new NetworkMessageBuilder();
-        builder.setToBroadcast().setMessageType(MessageType.NewGame).setGame(game.getGame());
-        connection.notifyClients(builder.exportMessage());
+        NetworkMessage message = new NetworkMessage();
+        message.setToBroadcast().setMessageType(MessageType.NewGame).setGame(game.getGame());
+        connection.notifyClients(message);
         game.start();
         notifyOfGameStrategy(game.getGame());
     }
@@ -59,9 +58,9 @@ public class GameHandler {
             }
             logger.info("Created Game: {}", game.getGame());
 
-            NetworkMessageBuilder builder = new NetworkMessageBuilder();
-            builder.setToBroadcast().setMessageType(MessageType.NewGame).setGame(game.getGame());
-            connection.notifyClients(builder.exportMessage());
+            NetworkMessage message = new NetworkMessage();
+            message.setToBroadcast().setMessageType(MessageType.NewGame).setGame(game.getGame());
+            connection.notifyClients(message);
             game.start();
         }
 

@@ -6,7 +6,6 @@ import org.PartyGames.Client.GameHandlers.GameHandler;
 import org.PartyGames.Client.GameHandlers.GameFactory;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
-import org.PartyGames.Common.Networking.NetworkMessageBuilder;
 import org.PartyGames.Common.Shared.Games;
 
 import java.util.ArrayList;
@@ -58,43 +57,54 @@ public class TerminalClient {
             checkConnectionTryReconnect();
             return;
         }
-        for (NetworkMessage message : server_messages) {
+        for (NetworkMessage action : server_messages) {
             if (!uuid.isEmpty()) {
-                if (!(message.isBroadcast() || message.getUUID().equalsIgnoreCase(uuid))) {
+                String addr = action.getAddress();
+                if (addr == null) { continue; }
+                if (!(action.isBroadcast() || action.getAddress().equalsIgnoreCase(uuid))) {
                     continue;
                 }
             }
-            switch (message.getType()) {
+            MessageType message_type = action.getMessageType();
+            switch (message_type) {
                 case MessageType.NetworkStatus -> {
-                    logger.info("Network Status: {}", message.getText());
+                    logger.info("Network Status: {}", action.getData());
                 }
                 case MessageType.ClientUUID -> {
-                    uuid = message.getText();
+                    String data = action.getData();
+                    if (data == null) { continue; }
+                    uuid = data;
                     logger.info("Got UUID: {}", uuid);
                 }
                 case MessageType.NewGame -> {
-                    if (message.getGame() != game_handler.getGame()) {
+                    Games message_game = action.getGame();
+                    if (message_game == null) { continue; }
+
+                    if (message_game != game_handler.getGame()) {
                         game_handler.stop();
-                        logger.info("Going to NewGame to: {}", message.getGame().toString());
-                        game_handler = GameFactory.createGameHandler(message.getGame(), io_handler, connection, uuid);
+                        logger.info("Going to NewGame to: {}", message_game);
+                        game_handler = GameFactory.createGameHandler(message_game, io_handler, connection, uuid);
                         game_handler.start();
                     }
                 }
                 case MessageType.GameStatus -> {
-                    if (game_handler.getGame() != message.getGame()) {
+                    Games message_game = action.getGame();
+                    if (message_game == null) { continue; }
+
+                    if (message_game != game_handler.getGame()) {
                         game_handler.stop();
-                        logger.info("Switching Games to: {}", message.getGame().toString());
-                        game_handler = GameFactory.createGameHandler(message.getGame(), io_handler, connection, uuid);
+                        logger.info("Switching Games to: {}", message_game);
+                        game_handler = GameFactory.createGameHandler(message_game, io_handler, connection, uuid);
                         game_handler.start();
                     } else {
                         // everything is ok, game is set correctly, respond back to server.
-                        NetworkMessageBuilder builder = new NetworkMessageBuilder();
-                        builder.setUUID(uuid).setMessageType(MessageType.ClientStatus).setText("ACK");
-                        connection.send(builder.exportMessage());
+                        NetworkMessage message = new NetworkMessage();
+                        message.setAddress(uuid).setMessageType(MessageType.ClientStatus).setData("ACK");
+                        connection.send(message);
                     }
                 }
             }
-            messages_for_game.add(message);
+            messages_for_game.add(action);
         }
         game_handler.handleGame(messages_for_game);
     }

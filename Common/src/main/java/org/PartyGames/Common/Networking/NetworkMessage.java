@@ -1,48 +1,84 @@
 package org.PartyGames.Common.Networking;
 
+import com.google.gson.Gson;
+import jdk.jfr.BooleanFlag;
 import org.PartyGames.Common.Shared.Games;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.text.ParseException;
 
 /** The underlying data that gets sent over the WebSocket */
 public class NetworkMessage {
-    private MessageType type;
+    /** Object for JSON parsing */
+    private static final Gson gson = new Gson();
+    @NotNull private MessageType type;
     /** Send value with this */
-    private String text;
+    @Nullable private String data;
     /** If you're sending a NewGame use this */
-    private Games game;
+    @Nullable private Games game;
     /** Address */
-    private String uuid;
+    @Nullable private String address;
+
+    /* Constructors */
     public NetworkMessage() {
         type = MessageType.Invalid;
-        text = "";
+        data = null;
         game = null;
-        uuid = "";
+        address = "broadcast";
     }
-    public NetworkMessage(MessageType type, String text, Games game, String uuid) {
-        this.type = type;
-        this.text = text;
-        this.game = game;
-        this.uuid = uuid;
-    }
+    /* --Constructors-- */
 
-    public void setType(MessageType type) {
-        this.type = type;
-    }
-    public MessageType getType() {
+    /* Builder Pattern methods */
+    @NotNull
+    public NetworkMessage setMessageType(MessageType type) { this.type = type; return this; }
+    @NotNull
+    public MessageType getMessageType() {
         return type;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-    public String getText() {
-        return text;
+    @NotNull
+    public NetworkMessage setData(String text) { this.data = text; return this; }
+    @Nullable
+    public String getData() {
+        return data;
     }
 
-    public void setGame(Games game) {this.game = game; }
+    @NotNull
+    public NetworkMessage setGame(Games game) {this.game = game; return this; }
+    @Nullable
     public Games getGame() { return this.game; }
 
-    public void setUUID(String uuid) { this.uuid = uuid; }
-    public String getUUID() { return this.uuid; }
+    @NotNull
+    public NetworkMessage setAddress(String address) { this.address = address; return this; }
+    @Nullable
+    public String getAddress() { return this.address; }
 
-    public boolean isBroadcast() { return uuid.equalsIgnoreCase("broadcast"); }
+    /** This function can be skipped, since by default address is broadcast */
+    @NotNull
+    public NetworkMessage setToBroadcast() { this.address = "broadcast"; return this; }
+    @BooleanFlag
+    public boolean isBroadcast() {
+        assert address != null;
+        return address.equalsIgnoreCase("broadcast");
+    }
+    /* --Builder Pattern methods-- */
+
+    /* Import/Export */
+
+    public static NetworkMessage fromString(String message) throws ParseException {
+        NetworkMessage parsed = gson.fromJson(message, NetworkMessage.class);
+        if (parsed != null) {
+            return parsed;
+        } else {
+            throw new ParseException("Internal NetworkMessage String format error, please contact project author", 0);
+        }
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return gson.toJson(this);
+    }
+    /* --Import/Export-- */
 }

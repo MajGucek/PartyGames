@@ -16,10 +16,10 @@ public class GameFactory {
         switch (game) {
             case Games.Null -> {
                 logger.warn("Used factory to create NullGame, Beware!");
-                return new NullGame(io_handler, connection, uuid);
+                return new NullGame().attachIOController(io_handler).attachWebSocketConnection(connection).attachUUID(uuid);
             }
             case Games.Lobby -> {
-                return new Lobby(io_handler, connection, uuid);
+                return new Lobby().attachIOController(io_handler).attachWebSocketConnection(connection).attachUUID(uuid);
             }
 
             default -> {

@@ -2,12 +2,10 @@ package org.PartyGames.Client.Games.Lobby;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
-import org.PartyGames.Client.Connections.WebSocketConnection;
 import org.PartyGames.Client.Games.GameClientController;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
 import org.PartyGames.Common.Shared.Games;
-import org.PartyGames.Client.Terminal.IOController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +19,9 @@ public class Lobby extends GameClientController {
     private boolean is_name_registered;
     private boolean was_name_denied;
     private boolean vote_start_games;
-    public Lobby(IOController io_handler, WebSocketConnection connection, String uuid) {
-        super(io_handler, connection, uuid);
+
+    public Lobby() {
+        super();
         this.unconfirmed_name = "";
         this.confirmed_name = "";
         has_sent_name = false;
@@ -33,11 +32,13 @@ public class Lobby extends GameClientController {
 
     @Override
     public void start() {
+        super.start();
         logger.info("Entered Lobby!");
     }
 
     @Override
     public void stop() {
+        super.stop();
         logger.info("Exiting Lobby!");
     }
     private void processServerMessages(List<NetworkMessage> server_messages) {

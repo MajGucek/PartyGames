@@ -11,15 +11,29 @@ import java.util.List;
 
 public abstract class GameClientController {
     private static final Logger logger = LoggerFactory.getLogger(GameClientController.class);
-    protected final IOController io_handler;
-    protected final WebSocketConnection connection;
-    protected final String uuid;
+    protected IOController io_handler;
+    protected WebSocketConnection connection;
+    protected String uuid;
 
-    public GameClientController(IOController io_handler, WebSocketConnection connection, String uuid) {
-        this.io_handler = io_handler;
-        this.connection = connection;
-        this.uuid = uuid;
+    public GameClientController() {
+        this.io_handler = null;
+        this.connection = null;
+        this.uuid = null;
     }
+
+    public GameClientController attachIOController(IOController io_controller) {
+        this.io_handler = io_controller;
+        return this;
+    }
+    public GameClientController attachWebSocketConnection(WebSocketConnection connection) {
+        this.connection = connection;
+        return this;
+    }
+    public GameClientController attachUUID(String uuid) {
+        this.uuid = uuid;
+        return this;
+    }
+
     public void start() {
         if (io_handler == null) {
             logger.error("IOController was not attached!");

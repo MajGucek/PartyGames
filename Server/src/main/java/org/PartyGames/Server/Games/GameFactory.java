@@ -43,7 +43,7 @@ public class GameFactory {
     public static GameServerController createGame(Games state, WebSocketServer connection) {
         switch (state) {
             case Lobby -> {
-                return new Lobby(connection);
+                return new Lobby().attachWebSocketServer(connection);
             }
             default -> {
                 logger.error("WOW buddy, slow down, please DO register {}, in the GameFactory.createGame() method!", state);

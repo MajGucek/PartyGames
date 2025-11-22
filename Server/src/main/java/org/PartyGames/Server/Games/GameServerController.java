@@ -21,10 +21,16 @@ public abstract class GameServerController {
     /**
      * In the concrete subclasses you must call this super constructor.
      */
-    public GameServerController(WebSocketServer connection) {
-        this.connection = connection;
+    public GameServerController() {
+        this.connection = null;
         is_finished = false;
     }
+
+    public GameServerController attachWebSocketServer(WebSocketServer connection) {
+        this.connection = connection;
+        return this;
+    }
+
     public boolean isFinished() { return is_finished; }
 
     /** Optionally @Override this method to add extra behavior */

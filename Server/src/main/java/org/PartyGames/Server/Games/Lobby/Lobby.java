@@ -20,8 +20,8 @@ public class Lobby extends GameServerController {
     private final Map<String, Boolean> client_votes;
 
     /** Call super constructor and initialize both internal Maps */
-    public Lobby(WebSocketServer connection) {
-        super(connection);
+    public Lobby() {
+        super();
         client_names = new HashMap<>();
         client_votes = new HashMap<>();
     }

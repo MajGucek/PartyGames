@@ -3,11 +3,10 @@ package org.PartyGames.Client;
 
 import org.PartyGames.Client.Connections.WebSocketConnection;
 import org.PartyGames.Client.Games.GameClientController;
-import org.PartyGames.Client.Games.GameFactory;
+import org.PartyGames.Client.Games.Factory.GameClientControllerFactory;
 import org.PartyGames.Client.Terminal.IOController;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
-import org.PartyGames.Common.Shared.Games;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,14 +21,15 @@ public class ClientController {
     private final IOController io_handler;
     private final WebSocketConnection connection;
     private GameClientController game_handler;
+    GameClientControllerFactory game_controller_factory;
 
     public ClientController(WebSocketConnection connection_handler, IOController io_handler) {
         this.uuid = "";
         last_reconnect_attempt = 0;
         this.io_handler = io_handler;
         this.connection = connection_handler;
-        this.game_handler = GameFactory.createGameHandler(Games.Null, io_handler, connection, uuid);
-
+        this.game_handler = null;
+        this.game_controller_factory = new GameClientControllerFactory();
     }
 
     private void checkConnectionTryReconnect()  {
@@ -46,6 +46,7 @@ public class ClientController {
     public void start() {
         connection.start();
         io_handler.start();
+        this.game_handler = game_controller_factory.createGameClientController("NullGame", io_handler, connection, uuid);
         game_handler.start();
     }
 
@@ -58,6 +59,7 @@ public class ClientController {
             checkConnectionTryReconnect();
             return;
         }
+        GameClientControllerFactory game_controller_factory = new GameClientControllerFactory();
         for (NetworkMessage action : server_messages) {
             if (!uuid.isEmpty()) {
                 String addr = action.getAddress();
@@ -78,24 +80,24 @@ public class ClientController {
                     logger.info("Got UUID: {}", uuid);
                 }
                 case MessageType.NewGame -> {
-                    Games message_game = action.getGame();
-                    if (message_game == null) { continue; }
+                    String new_game_name = action.getData();
+                    if (new_game_name == null) { continue; }
 
-                    if (message_game != game_handler.getGame()) {
+                    if (!new_game_name.equals(game_handler.getClass().getSimpleName())) {
                         game_handler.stop();
-                        logger.info("Going to NewGame to: {}", message_game);
-                        game_handler = GameFactory.createGameHandler(message_game, io_handler, connection, uuid);
+                        logger.info("Going to NewGame to: {}", new_game_name);
+                        game_handler = game_controller_factory.createGameClientController(new_game_name, io_handler, connection, uuid);
                         game_handler.start();
                     }
                 }
                 case MessageType.GameStatus -> {
-                    Games message_game = action.getGame();
+                    String message_game = action.getData();
                     if (message_game == null) { continue; }
 
-                    if (message_game != game_handler.getGame()) {
+                    if (!message_game.equals(game_handler.getClass().getSimpleName())) {
                         game_handler.stop();
                         logger.info("Switching Games to: {}", message_game);
-                        game_handler = GameFactory.createGameHandler(message_game, io_handler, connection, uuid);
+                        game_handler = game_controller_factory.createGameClientController(message_game, io_handler, connection, uuid);
                         game_handler.start();
                     } else {
                         // everything is ok, game is set correctly, respond back to server.

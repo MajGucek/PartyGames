@@ -2,7 +2,6 @@ package org.PartyGames.Client.Games;
 
 import org.PartyGames.Client.Connections.WebSocketConnection;
 import org.PartyGames.Common.Networking.NetworkMessage;
-import org.PartyGames.Common.Shared.Games;
 import org.PartyGames.Client.Terminal.IOController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,5 +53,4 @@ public abstract class GameClientController {
     }
 
     public abstract void handleGame(List<NetworkMessage> messages);
-    public abstract Games getGame();
 }

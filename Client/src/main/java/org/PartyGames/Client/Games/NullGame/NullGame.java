@@ -2,7 +2,6 @@ package org.PartyGames.Client.Games.NullGame;
 
 import org.PartyGames.Client.Games.GameClientController;
 import org.PartyGames.Common.Networking.NetworkMessage;
-import org.PartyGames.Common.Shared.Games;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,10 +29,5 @@ public class NullGame extends GameClientController {
         io_handler.drawText(2, 5, "Waiting for a Connection!", "rgb(255, 255, 255)");
         io_handler.render();
         logger.warn("You're handling the NullGame, Beware!");
-    }
-
-    @Override
-    public Games getGame() {
-        return Games.Null;
     }
 }

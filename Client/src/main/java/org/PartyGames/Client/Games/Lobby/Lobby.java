@@ -5,7 +5,6 @@ import com.googlecode.lanterna.input.KeyType;
 import org.PartyGames.Client.Games.GameClientController;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
-import org.PartyGames.Common.Shared.Games;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,10 +156,5 @@ public class Lobby extends GameClientController {
                 io_handler.drawText(11, 4, "No", "rgb(255, 0, 0)");
             }
         }
-    }
-
-    @Override
-    public Games getGame() {
-        return Games.Lobby;
     }
 }

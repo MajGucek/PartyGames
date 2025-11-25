@@ -4,7 +4,6 @@ import org.PartyGames.Server.Games.GameServerController;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
 import org.PartyGames.Server.Connections.*;
-import org.PartyGames.Common.Shared.Games;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
@@ -122,9 +121,6 @@ public class Lobby extends GameServerController {
         }
 
         if (end_lobby && !client_votes.isEmpty()) {
-            NetworkMessage message = new NetworkMessage();
-            message.setToBroadcast().setMessageType(MessageType.GameStatus).setData("Ending Lobby").setGame(Games.Lobby);
-            connection.notifyClients(message);
             stop();
         }
 
@@ -138,9 +134,4 @@ public class Lobby extends GameServerController {
         logger.info("Exiting Lobby state");
     }
 
-    @Override
-    public Games getGame() {
-        /* Make sure to register your game in Common:org.PartyGames.Shared.Games */
-        return Games.Lobby;
-    }
 }

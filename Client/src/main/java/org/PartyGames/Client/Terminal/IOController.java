@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+
 public class IOController {
     private static final Logger logger = LoggerFactory.getLogger(IOController.class);
     // This is purely for rendering,
@@ -33,8 +35,22 @@ public class IOController {
 
     public void start() {
         DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
+        //defaultTerminalFactory.setForceTextTerminal(true);
+        //defaultTerminalFactory.setInitialTerminalSize(TerminalSize.ONE);
         try {
             Terminal terminal = defaultTerminalFactory.createTerminal();
+            /*
+            if (terminal instanceof JFrame frame) {
+                frame.setDefaultCloseOperation(JFrame.MAXIMIZED_BOTH);
+                frame.setResizable(false);
+            }
+
+            if (terminal instanceof SwingTerminalFrame frame) {
+                frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                frame.setResizable(false);
+            }
+            */
+
             screen = new TerminalScreen(terminal);
             screen.startScreen();
             hideCursor();

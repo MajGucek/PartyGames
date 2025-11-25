@@ -2,17 +2,8 @@ package org.PartyGames.Server.Games;
 
 import org.PartyGames.Common.Networking.NetworkMessage;
 import org.PartyGames.Server.Connections.WebSocketServer;
-import org.PartyGames.Common.Shared.Games;
 import java.util.List;
 
-/**
- * This is the Base for all the games on the Server side <p>
- * To make a game you must extend this class and implement the two abstract methods: <p>
- * handleGame() and getGame() <p>
- * The implementation for getGame() is trivial, but firstly you must register your in:
- * Common:org.PartyGames.Shared.Games and then click the right upper Maven logo, then:
- * Under Lifecycle, clean and install. That will recompile the Common module.
- */
 
 public abstract class GameServerController {
     /** This variable represents the state of the server */
@@ -45,9 +36,4 @@ public abstract class GameServerController {
      */
     public abstract void handleGame(List<NetworkMessage> messages);
 
-    /**
-     * You must implement this method such that getGame() return a Games.GameName
-     * @return Concrete subclasses equivalent of the Common:org.PartyGames.Shared.Games enum, look in Lobby, for example
-     */
-    public abstract Games getGame();
 }

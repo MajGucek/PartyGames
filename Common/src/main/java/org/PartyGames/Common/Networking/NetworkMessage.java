@@ -2,7 +2,6 @@ package org.PartyGames.Common.Networking;
 
 import com.google.gson.Gson;
 import jdk.jfr.BooleanFlag;
-import org.PartyGames.Common.Shared.Games;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,8 +14,6 @@ public class NetworkMessage {
     @NotNull private MessageType type;
     /** Send value with this */
     @Nullable private String data;
-    /** If you're sending a NewGame use this */
-    @Nullable private Games game;
     /** Address */
     @Nullable private String address;
 
@@ -24,7 +21,6 @@ public class NetworkMessage {
     public NetworkMessage() {
         type = MessageType.Invalid;
         data = null;
-        game = null;
         address = "broadcast";
     }
     /* --Constructors-- */
@@ -43,11 +39,6 @@ public class NetworkMessage {
     public String getData() {
         return data;
     }
-
-    @NotNull
-    public NetworkMessage setGame(Games game) {this.game = game; return this; }
-    @Nullable
-    public Games getGame() { return this.game; }
 
     @NotNull
     public NetworkMessage setAddress(String address) { this.address = address; return this; }

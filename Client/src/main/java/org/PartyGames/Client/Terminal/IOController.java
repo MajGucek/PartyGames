@@ -161,6 +161,11 @@ public class IOController {
         return null;
     }
 
+    @SuppressWarnings("unused")
+    public static TextColor.RGB getRGB(int r, int g, int b) {
+        return new TextColor.RGB(r, g, b);
+    }
+
 
     @SuppressWarnings("unused")
     private static boolean isWindowsOS() {

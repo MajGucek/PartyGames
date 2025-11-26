@@ -114,9 +114,12 @@ public class ClientController {
 
 
     public void shutdown() {
+        logger.info("Requested shutdown");
         game_handler.stop();
+        logger.info("game_handler stopped");
         connection.stop();
+        logger.info("connection stopped");
         io_handler.stop();
-        logger.info("Shutdown Terminal Client!");
+        logger.info("io_handler stopped");
     }
 }

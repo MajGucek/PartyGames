@@ -18,11 +18,13 @@ public class Main {
 
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-        executor.scheduleAtFixedRate(game::update, 0, PERIOD_NANO, TimeUnit.NANOSECONDS);
-
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             executor.shutdown();
             game.shutdown();
         }));
+
+        executor.scheduleAtFixedRate(game::update, 0, PERIOD_NANO, TimeUnit.NANOSECONDS);
+
+
     }
 }

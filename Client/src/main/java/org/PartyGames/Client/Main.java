@@ -6,7 +6,7 @@ import org.PartyGames.Client.Terminal.IOController;
 import java.util.concurrent.*;
 
 public class Main {
-    static void main() {
+    public static void main(String args[]) {
         String server_address = "ws://localhost:8887";
         WebSocketConnection connection_handler = new WebSocketConnection(server_address);
         IOController io_handler = new IOController();
@@ -23,11 +23,12 @@ public class Main {
 
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            client.shutdown();
+            executor.shutdownNow();
+        }));
+
         executor.scheduleAtFixedRate(client::update, 0, PERIOD_NANO, TimeUnit.NANOSECONDS);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            executor.shutdown();
-            client.shutdown();
-        }));
     }
 }

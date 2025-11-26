@@ -11,10 +11,15 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
+import com.googlecode.lanterna.terminal.swing.TerminalEmulatorAutoCloseTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,22 +39,29 @@ public class IOController {
 
 
     public void start() {
+        logger.info("IOHandler registered on OS: {}", System.getProperty("os.name").toLowerCase());
         DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
-        //defaultTerminalFactory.setForceTextTerminal(true);
-        //defaultTerminalFactory.setInitialTerminalSize(TerminalSize.ONE);
+        if (isLinuxOS()) {
+            defaultTerminalFactory.setForceTextTerminal(true);
+        }
+        defaultTerminalFactory.setTerminalEmulatorTitle("Party Games");
         try {
             Terminal terminal = defaultTerminalFactory.createTerminal();
-            /*
-            if (terminal instanceof JFrame frame) {
-                frame.setDefaultCloseOperation(JFrame.MAXIMIZED_BOTH);
-                frame.setResizable(false);
-            }
-
+            logger.info("Created terminal off type: {}", terminal.getClass().getSimpleName());
             if (terminal instanceof SwingTerminalFrame frame) {
+                logger.info("Using SwingTerminalFrame!");
                 frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
                 frame.setResizable(false);
+
+                frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+                frame.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        System.exit(0);
+
+                    }
+                });
             }
-            */
 
             screen = new TerminalScreen(terminal);
             screen.startScreen();
@@ -62,11 +74,7 @@ public class IOController {
 
 
     public void stop() {
-        try {
-            screen.stopScreen();
-        } catch (IOException e) {
-            logger.error("Error stopping: {}", String.valueOf(e));
-        }
+        screen = null;
     }
 
 
@@ -147,4 +155,12 @@ public class IOController {
         return null;
     }
 
+
+
+    private static boolean isWindowsOS() {
+        return System.getProperty("os.name").toLowerCase().contains("win");
+    }
+    private static boolean isLinuxOS() {
+        return System.getProperty("os.name").toLowerCase().contains("linux");
+    }
 }

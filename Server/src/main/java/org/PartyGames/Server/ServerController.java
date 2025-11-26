@@ -8,15 +8,10 @@ import org.PartyGames.Server.Games.GameServerController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * The Main Class that is responsible for switching Games and game looping
- */
 public class ServerController {
     private static final Logger logger = LoggerFactory.getLogger(ServerController.class);
     private final WebSocketServer connection;
-    /** A Game instance, notice how it's the Abstract class, because of the Factory*/
     private GameServerController game_controller;
-    /** The last time I've sent a GameState message */
     private long last_time_sent_game;
     private final GameServerControllerFactory game_server_controller_factory;
 
@@ -26,7 +21,7 @@ public class ServerController {
         game_controller = game_server_controller_factory.createGameServerController("Lobby", connection);
         last_time_sent_game = 0;
     }
-    /** Helper method to notify Clients of the current Game going on */
+
     private void notifyOfGameStrategy(String game) {
         NetworkMessage message = new NetworkMessage();
         message.setToBroadcast().setMessageType(MessageType.GameStatus).setData(game);
@@ -46,7 +41,7 @@ public class ServerController {
         game_controller.start();
         notifyOfGameStrategy(game_controller.getClass().getSimpleName());
     }
-    /** The main Loop of the GameHandler */
+
     public void update() {
         if (game_controller.isFinished()) {
             connection.consumeMessages();

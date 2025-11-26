@@ -8,9 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
 
-/**
- * This is the Lobby game class.
- */
 public class Lobby extends GameServerController {
     private static final Logger logger = LoggerFactory.getLogger(Lobby.class);
     /** Map: Client-ID -> Client-Name */
@@ -18,24 +15,18 @@ public class Lobby extends GameServerController {
     /** Map: Client-ID -> if it has voted */
     private final Map<String, Boolean> client_votes;
 
-    /** Call super constructor and initialize both internal Maps */
     public Lobby() {
         super();
         client_names = new HashMap<>();
         client_votes = new HashMap<>();
     }
 
-    /** Overridden start method that just logs That its in Lobby */
     @Override
     public void start() {
         super.start();
         logger.info("Now in Lobby");
     }
 
-    /**
-     * @param messages these are the NetworkMessages in-order that have been sent by the clients
-     * This method implements the main logic for Lobby game.
-     */
     @Override
     public void handleGame(List<NetworkMessage> messages) {
         // Iterate over messages
@@ -130,7 +121,6 @@ public class Lobby extends GameServerController {
     @Override
     public void stop() {
         super.stop();
-        /* Below is extra behavior, you don't need to overload stop, unless you need extra cleanup */
         logger.info("Exiting Lobby state");
     }
 

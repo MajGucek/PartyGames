@@ -19,7 +19,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
-import com.googlecode.lanterna.terminal.swing.TerminalEmulatorAutoCloseTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +38,7 @@ public class IOController {
 
 
     public void start() {
-        logger.info("IOHandler registered on OS: {}", System.getProperty("os.name").toLowerCase());
+        logger.info("IOController registered on OS: {}", System.getProperty("os.name").toLowerCase());
         DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
         if (isLinuxOS()) {
             defaultTerminalFactory.setForceTextTerminal(true);
@@ -86,7 +85,7 @@ public class IOController {
         }
     }
 
-
+    @SuppressWarnings("unused")
     public void drawSquare(int x, int y, int w, int h, String color) {
         graphics.setBackgroundColor(getRGB(color));
         graphics.fillRectangle(new TerminalPosition(x, y), new TerminalSize(w, h), ' ');
@@ -107,7 +106,7 @@ public class IOController {
         }
     }
 
-
+    @SuppressWarnings("unused")
     public void setCursor(int x, int y) {
         if (screen != null) {
             screen.setCursorPosition(new TerminalPosition(x, y));
@@ -163,7 +162,7 @@ public class IOController {
     }
 
 
-
+    @SuppressWarnings("unused")
     private static boolean isWindowsOS() {
         return System.getProperty("os.name").toLowerCase().contains("win");
     }

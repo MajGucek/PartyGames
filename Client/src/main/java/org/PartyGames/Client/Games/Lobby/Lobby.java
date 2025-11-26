@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class Lobby extends GameClientController {
     private static final Logger logger = LoggerFactory.getLogger(Lobby.class);
     private String unconfirmed_name;
@@ -42,7 +43,7 @@ public class Lobby extends GameClientController {
     }
     private void processServerMessages(List<NetworkMessage> server_messages) {
         if (server_messages == null) {
-            io_handler.clearScreen();
+            io_controller.clearScreen();
             return;
         }
          for (NetworkMessage action : server_messages) {
@@ -72,12 +73,12 @@ public class Lobby extends GameClientController {
     public void handleGame(List<NetworkMessage> messages) {
         processServerMessages(messages);
         processIO();
-        io_handler.render();
+        io_controller.render();
     }
 
     private void processIO() {
-        io_handler.clearScreen();
-        KeyStroke input = io_handler.poll();
+        io_controller.clearScreen();
+        KeyStroke input = io_controller.poll();
         StringBuilder string_builder = new StringBuilder(unconfirmed_name);
         if (input != null) {
             switch (input.getKeyType()) {
@@ -135,25 +136,25 @@ public class Lobby extends GameClientController {
 
         if (has_sent_name && !is_name_registered) {
             if (was_name_denied) {
-                io_handler.drawText(0, 5, "Your name was denied!", "rgb(255, 0, 0)");
-                io_handler.drawText(0, 6, "Press Enter to re-enter name", "rgb(255, 255, 255)");
+                io_controller.drawText(0, 5, "Your name was denied!", "rgb(255, 0, 0)");
+                io_controller.drawText(0, 6, "Press Enter to re-enter name", "rgb(255, 255, 255)");
             } else {
-                io_handler.drawText(0, 5, "You have sent Name: "
+                io_controller.drawText(0, 5, "You have sent Name: "
                         + unconfirmed_name +
                         ", Waiting for response", "rgb(255, 0, 255)");
             }
 
         } else if (!has_sent_name && !is_name_registered) {
-            io_handler.drawText(0, 5, "Input Name: " + unconfirmed_name, "rgb(255, 125, 255)");
+            io_controller.drawText(0, 5, "Input Name: " + unconfirmed_name, "rgb(255, 125, 255)");
         }
 
         if (is_name_registered && !confirmed_name.isEmpty()) {
-            io_handler.drawText(4, 2, "Your Name: " + confirmed_name, "rgb(0, 255, 0)");
-            io_handler.drawText(4, 3, "Press y/n to vote to start/remove your vote", "rgb(255, 255, 255)");
+            io_controller.drawText(4, 2, "Your Name: " + confirmed_name, "rgb(0, 255, 0)");
+            io_controller.drawText(4, 3, "Press y/n to vote to start/remove your vote", "rgb(255, 255, 255)");
             if (vote_start_games) {
-                io_handler.drawText(11, 4, "Yes", "rgb(0, 0, 255)");
+                io_controller.drawText(11, 4, "Yes", "rgb(0, 0, 255)");
             } else {
-                io_handler.drawText(11, 4, "No", "rgb(255, 0, 0)");
+                io_controller.drawText(11, 4, "No", "rgb(255, 0, 0)");
             }
         }
     }

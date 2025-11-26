@@ -18,17 +18,17 @@ public class ClientController {
     private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
     private String uuid;
     private long last_reconnect_attempt;
-    private final IOController io_handler;
+    private final IOController io_controller;
     private final WebSocketConnection connection;
-    private GameClientController game_handler;
+    private GameClientController game_controller;
     GameClientControllerFactory game_controller_factory;
 
-    public ClientController(WebSocketConnection connection_handler, IOController io_handler) {
+    public ClientController(WebSocketConnection connection, IOController io_controller) {
         this.uuid = "";
         last_reconnect_attempt = 0;
-        this.io_handler = io_handler;
-        this.connection = connection_handler;
-        this.game_handler = null;
+        this.io_controller = io_controller;
+        this.connection = connection;
+        this.game_controller = null;
         this.game_controller_factory = new GameClientControllerFactory();
     }
 
@@ -45,11 +45,11 @@ public class ClientController {
 
     public void start() {
         connection.start();
-        io_handler.start();
-        this.game_handler = game_controller_factory.createGameClientController("NullGame", io_handler, connection, uuid);
-        game_handler.start();
-        logger.info("Width: {}", io_handler.getCharWidth());
-        logger.info("Height: {}", io_handler.getCharHeight());
+        io_controller.start();
+        this.game_controller = game_controller_factory.createGameClientController("NullGame", io_controller, connection, uuid);
+        game_controller.start();
+        logger.info("Width: {}", io_controller.getCharWidth());
+        logger.info("Height: {}", io_controller.getCharHeight());
     }
 
 
@@ -72,9 +72,8 @@ public class ClientController {
             }
             MessageType message_type = action.getMessageType();
             switch (message_type) {
-                case MessageType.NetworkStatus -> {
-                    logger.info("Network Status: {}", action.getData());
-                }
+                case MessageType.NetworkStatus -> logger.info("Network Status: {}", action.getData());
+                
                 case MessageType.ClientUUID -> {
                     String data = action.getData();
                     if (data == null) { continue; }
@@ -85,22 +84,22 @@ public class ClientController {
                     String new_game_name = action.getData();
                     if (new_game_name == null) { continue; }
 
-                    if (!new_game_name.equals(game_handler.getClass().getSimpleName())) {
-                        game_handler.stop();
+                    if (!new_game_name.equals(game_controller.getClass().getSimpleName())) {
+                        game_controller.stop();
                         logger.info("Going to NewGame to: {}", new_game_name);
-                        game_handler = game_controller_factory.createGameClientController(new_game_name, io_handler, connection, uuid);
-                        game_handler.start();
+                        game_controller = game_controller_factory.createGameClientController(new_game_name, io_controller, connection, uuid);
+                        game_controller.start();
                     }
                 }
                 case MessageType.GameStatus -> {
                     String message_game = action.getData();
                     if (message_game == null) { continue; }
 
-                    if (!message_game.equals(game_handler.getClass().getSimpleName())) {
-                        game_handler.stop();
+                    if (!message_game.equals(game_controller.getClass().getSimpleName())) {
+                        game_controller.stop();
                         logger.info("Switching Games to: {}", message_game);
-                        game_handler = game_controller_factory.createGameClientController(message_game, io_handler, connection, uuid);
-                        game_handler.start();
+                        game_controller = game_controller_factory.createGameClientController(message_game, io_controller, connection, uuid);
+                        game_controller.start();
                     } else {
                         // everything is ok, game is set correctly, respond back to server.
                         NetworkMessage message = new NetworkMessage();
@@ -111,17 +110,17 @@ public class ClientController {
             }
             messages_for_game.add(action);
         }
-        game_handler.handleGame(messages_for_game);
+        game_controller.handleGame(messages_for_game);
     }
 
 
     public void shutdown() {
         logger.info("Requested shutdown");
-        game_handler.stop();
-        logger.info("game_handler stopped");
+        game_controller.stop();
+        logger.info("game_controller stopped");
         connection.stop();
         logger.info("connection stopped");
-        io_handler.stop();
-        logger.info("io_handler stopped");
+        io_controller.stop();
+        logger.info("io_controller stopped");
     }
 }

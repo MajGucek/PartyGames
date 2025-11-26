@@ -10,18 +10,18 @@ import java.util.List;
 
 public abstract class GameClientController {
     private static final Logger logger = LoggerFactory.getLogger(GameClientController.class);
-    protected IOController io_handler;
+    protected IOController io_controller;
     protected WebSocketConnection connection;
     protected String uuid;
 
     public GameClientController() {
-        this.io_handler = null;
+        this.io_controller = null;
         this.connection = null;
         this.uuid = null;
     }
 
     public GameClientController attachIOController(IOController io_controller) {
-        this.io_handler = io_controller;
+        this.io_controller = io_controller;
         return this;
     }
     public GameClientController attachWebSocketConnection(WebSocketConnection connection) {
@@ -34,7 +34,7 @@ public abstract class GameClientController {
     }
 
     public void start() {
-        if (io_handler == null) {
+        if (io_controller == null) {
             logger.error("IOController was not attached!");
             throw new AssertionError("IOController was not attached!");
         }
@@ -46,10 +46,10 @@ public abstract class GameClientController {
             logger.error("UUID was not attached!");
             throw new AssertionError("UUID was not attached!");
         }
-        io_handler.clearScreen();
+        io_controller.clearScreen();
     }
     public void stop() {
-        io_handler.clearScreen();
+        io_controller.clearScreen();
     }
 
     public abstract void handleGame(List<NetworkMessage> messages);

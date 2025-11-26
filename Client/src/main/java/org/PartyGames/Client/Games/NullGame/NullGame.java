@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class NullGame extends GameClientController {
     protected static final Logger logger = LoggerFactory.getLogger(NullGame.class);
     public NullGame() {
@@ -26,8 +27,8 @@ public class NullGame extends GameClientController {
 
     @Override
     public void handleGame(List<NetworkMessage> messages) {
-        io_handler.drawText(2, 5, "Waiting for a Connection!", "rgb(255, 255, 255)");
-        io_handler.render();
+        io_controller.drawText(2, 5, "Waiting for a Connection!", "rgb(255, 255, 255)");
+        io_controller.render();
         logger.warn("You're handling the NullGame, Beware!");
     }
 }

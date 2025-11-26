@@ -48,6 +48,8 @@ public class ClientController {
         io_handler.start();
         this.game_handler = game_controller_factory.createGameClientController("NullGame", io_handler, connection, uuid);
         game_handler.start();
+        logger.info("Width: {}", io_handler.getCharWidth());
+        logger.info("Height: {}", io_handler.getCharHeight());
     }
 
 

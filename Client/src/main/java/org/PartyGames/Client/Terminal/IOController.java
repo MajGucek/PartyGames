@@ -114,7 +114,14 @@ public class IOController {
         } else {
             logger.error("Cannot set Cursor, because screen == null!");
         }
+    }
 
+
+    public int getCharWidth() {
+        return screen.getTerminalSize().getRows();
+    }
+    public int getCharHeight() {
+        return screen.getTerminalSize().getColumns();
     }
 
 

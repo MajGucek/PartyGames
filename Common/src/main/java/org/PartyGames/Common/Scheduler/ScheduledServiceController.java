@@ -10,7 +10,7 @@ public class ScheduledServiceController {
     private final int TPS;
     private final List<ServiceWrapper> service_list;
 
-    private record ServiceWrapper(String name, Service service, int TPS) {}
+    private record ServiceWrapper(String name, Service service, int TPS) { }
 
     public ScheduledServiceController(int TPS) {
         this.TPS = TPS;
@@ -31,14 +31,15 @@ public class ScheduledServiceController {
         if (Objects.equals(name, "")) {
             throw new IllegalArgumentException("Cannot remove Service with no name!");
         }
-        service_list.removeIf((service) -> service.name.equals(name));
+        service_list.removeIf(service -> service.name.equals(name));
     }
 
     public void executeServices(int tick) {
-        service_list.forEach((service) -> {
+        service_list.forEach(service -> {
             if (tick % (TPS / service.TPS) == 0) {
                 service.service.execute();
-            }});
+            }
+        });
     }
 }
 

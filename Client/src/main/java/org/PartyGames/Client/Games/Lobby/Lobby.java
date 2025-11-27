@@ -46,26 +46,27 @@ public class Lobby extends GameClientController {
             io_controller.clearScreen();
             return;
         }
-         for (NetworkMessage action : server_messages) {
-             MessageType message_type = action.getMessageType();
-             if (message_type.equals(MessageType.Invalid)) { continue; }
+        for (NetworkMessage action : server_messages) {
+            MessageType message_type = action.getMessageType();
+            if (message_type.equals(MessageType.Invalid)) { continue; }
 
-             switch (message_type) {
-                 case MessageType.ClientName -> {
-                     String data = action.getData();
-                     if (data == null) { continue; }
-                     // unconfirmed_name was accepted
-                     logger.info("Name was accepted");
-                     is_name_registered = true;
-                     confirmed_name = data;
-                 }
-                 case MessageType.ClientError -> {
-                     logger.info("Name was denied!");
-                     is_name_registered = false;
-                     unconfirmed_name = "";
-                     was_name_denied = true;
-                 }
-             }
+            switch (message_type) {
+                case MessageType.ClientName -> {
+                    String data = action.getData();
+                    if (data == null) { continue; }
+                    // unconfirmed_name was accepted
+                    logger.info("Name was accepted");
+                    is_name_registered = true;
+                    confirmed_name = data;
+                }
+                case MessageType.ClientError -> {
+                    logger.info("Name was denied!");
+                    is_name_registered = false;
+                    unconfirmed_name = "";
+                    was_name_denied = true;
+                }
+                default -> { }
+            }
         }
     }
 
@@ -131,6 +132,7 @@ public class Lobby extends GameClientController {
                         }
                     }
                 }
+                default -> { }
             }
         }
 

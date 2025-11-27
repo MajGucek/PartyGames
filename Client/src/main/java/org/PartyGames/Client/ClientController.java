@@ -36,7 +36,7 @@ public class ClientController {
         this.current_tick = 0;
     }
 
-    private void checkConnectionTryReconnect()  {
+    private void checkConnectionTryReconnect() {
         if (!connection.isConnected()) {
             long now = System.currentTimeMillis();
             if (now - last_reconnect_attempt >= 2000) {
@@ -50,7 +50,13 @@ public class ClientController {
     public void start() {
         connection.start();
         io_controller.start();
-        this.game_controller = game_controller_factory.createGameClientController("NullGame", io_controller, connection, uuid, TPS);
+        this.game_controller = game_controller_factory.createGameClientController(
+                "NullGame",
+                io_controller,
+                connection,
+                uuid,
+                TPS
+        );
         game_controller.start();
         logger.info("Width: {}", io_controller.getCharWidth());
         logger.info("Height: {}", io_controller.getCharHeight());
@@ -69,7 +75,9 @@ public class ClientController {
         for (NetworkMessage action : server_messages) {
             if (!uuid.isEmpty()) {
                 String addr = action.getAddress();
-                if (addr == null) { continue; }
+                if (addr == null) {
+                    continue;
+                }
                 if (!(action.isBroadcast() || action.getAddress().equalsIgnoreCase(uuid))) {
                     continue;
                 }
@@ -91,7 +99,13 @@ public class ClientController {
                     if (!new_game_name.equals(game_controller.getClass().getSimpleName())) {
                         game_controller.stop();
                         logger.info("Going to NewGame to: {}", new_game_name);
-                        game_controller = game_controller_factory.createGameClientController(new_game_name, io_controller, connection, uuid, TPS);
+                        game_controller = game_controller_factory.createGameClientController(
+                                new_game_name,
+                                io_controller,
+                                connection,
+                                uuid,
+                                TPS
+                        );
                         game_controller.start();
                     }
                 }
@@ -102,7 +116,13 @@ public class ClientController {
                     if (!message_game.equals(game_controller.getClass().getSimpleName())) {
                         game_controller.stop();
                         logger.info("Switching Games to: {}", message_game);
-                        game_controller = game_controller_factory.createGameClientController(message_game, io_controller, connection, uuid, TPS);
+                        game_controller = game_controller_factory.createGameClientController(
+                                message_game,
+                                io_controller,
+                                connection,
+                                uuid,
+                                TPS
+                        );
                         game_controller.start();
                     } else {
                         // everything is ok, game is set correctly, respond back to server.
@@ -111,8 +131,8 @@ public class ClientController {
                         connection.send(message);
                     }
                 }
+                default -> messages_for_game.add(action);
             }
-            messages_for_game.add(action);
         }
         game_controller.handleGame(messages_for_game, (int) (current_tick % TPS));
         current_tick++;

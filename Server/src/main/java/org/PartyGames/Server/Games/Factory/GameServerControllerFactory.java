@@ -17,8 +17,9 @@ public class GameServerControllerFactory {
     public static final Logger logger = LoggerFactory.getLogger(GameServerControllerFactory.class);
 
     public String getRandomGame() {
-        List<Class<? extends GameServerController>> clazz_list = GameServerControllerRegistry.getInstance().getControllers().stream().filter(
-            c -> !c.equals(Lobby.class)
+        List<Class<? extends GameServerController>> clazz_list =
+                GameServerControllerRegistry.getInstance().getControllers().stream()
+                        .filter(c -> !c.equals(Lobby.class)
         ).toList();
 
         if (clazz_list.isEmpty()) {

@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import java.util.Optional;
 import java.util.Set;
 
-class GameServerControllerRegistry {
+final class GameServerControllerRegistry {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(GameServerControllerRegistry.class);
     private static volatile GameServerControllerRegistry instance;
 
@@ -16,9 +16,9 @@ class GameServerControllerRegistry {
     private GameServerControllerRegistry() {
         Reflections reflections = new Reflections("org.PartyGames.Server.Games");
         this.controllers = reflections.getSubTypesOf(GameServerController.class);
-        this.controllers.forEach(c -> {
-            logger.info("Registered controller: {}", c.getName());
-        });
+        this.controllers.forEach(c ->
+            logger.info("Registered controller: {}", c.getName())
+        );
     }
 
     public static GameServerControllerRegistry getInstance() {
@@ -43,7 +43,8 @@ class GameServerControllerRegistry {
                 .stream()
                 .filter(
                         c ->
-                                c.getName().equalsIgnoreCase(class_name) || c.getSimpleName().equalsIgnoreCase(class_name)
+                                c.getName().equalsIgnoreCase(class_name)
+                                        || c.getSimpleName().equalsIgnoreCase(class_name)
                 )
                 .findFirst();
     }

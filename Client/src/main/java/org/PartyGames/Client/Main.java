@@ -4,9 +4,12 @@ import org.PartyGames.Client.Connections.WebSocketConnection;
 import org.PartyGames.Client.Games.Factory.GameClientControllerRegistry;
 import org.PartyGames.Client.Terminal.IOController;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public class Main {
+
+final class Main {
     static void main() {
         String server_address = "ws://localhost:8887";
         final int TPS = 60;
@@ -19,7 +22,7 @@ public class Main {
 
         try {
             Thread.sleep(2000);
-        } catch (InterruptedException ignored) {}
+        } catch (InterruptedException ignored) { }
 
         final long PERIOD_NANO = 1_000_000_000L / TPS;
 
@@ -33,4 +36,6 @@ public class Main {
 
 
     }
+
+    private Main() { }
 }

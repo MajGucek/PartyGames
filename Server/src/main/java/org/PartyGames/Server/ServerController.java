@@ -1,6 +1,7 @@
 package org.PartyGames.Server;
 
-import org.PartyGames.Common.Networking.*;
+import org.PartyGames.Common.Networking.MessageType;
+import org.PartyGames.Common.Networking.NetworkMessage;
 import org.PartyGames.Server.Connections.WebSocketServer;
 
 import org.PartyGames.Server.Games.Factory.GameServerControllerFactory;
@@ -36,7 +37,9 @@ public class ServerController {
         connection.start();
         logger.info("Server started on port: {}", connection.getPort());
         NetworkMessage message = new NetworkMessage();
-        message.setToBroadcast().setMessageType(MessageType.NewGame).setData(game_controller.getClass().getSimpleName());
+        message.setToBroadcast()
+                .setMessageType(MessageType.NewGame)
+                .setData(game_controller.getClass().getSimpleName());
         connection.notifyClients(message);
         game_controller.start();
         notifyOfGameStrategy(game_controller.getClass().getSimpleName());
@@ -48,12 +51,17 @@ public class ServerController {
             connection.clearBuffer();
             logger.info("Finished with a game!");
 
-            game_controller = game_server_controller_factory.createGameServerController(game_server_controller_factory.getRandomGame(), connection);
+            game_controller = game_server_controller_factory.createGameServerController(
+                    game_server_controller_factory.getRandomGame(),
+                    connection
+            );
 
             logger.info("Created Game: {}", game_controller.getClass().getSimpleName());
 
             NetworkMessage message = new NetworkMessage();
-            message.setToBroadcast().setMessageType(MessageType.NewGame).setData(game_controller.getClass().getSimpleName());
+            message.setToBroadcast()
+                    .setMessageType(MessageType.NewGame)
+                    .setData(game_controller.getClass().getSimpleName());
             connection.notifyClients(message);
             game_controller.start();
         }

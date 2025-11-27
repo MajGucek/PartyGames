@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /** Thread-Safe Singleton for getting all Classes that Extend GameClientController */
-public class GameClientControllerRegistry {
+public final class GameClientControllerRegistry {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(GameClientControllerRegistry.class);
     private static volatile GameClientControllerRegistry instance;
 
@@ -17,9 +17,9 @@ public class GameClientControllerRegistry {
     private GameClientControllerRegistry() {
         Reflections reflections = new Reflections("org.PartyGames.Client.Games");
         this.controllers = reflections.getSubTypesOf(GameClientController.class);
-        this.controllers.forEach(c -> {
-            logger.info("Registered controller: {}", c.getName());
-        });
+        this.controllers.forEach(c ->
+            logger.info("Registered controller: {}", c.getName())
+        );
     }
 
     public static GameClientControllerRegistry getInstance() {
@@ -40,7 +40,8 @@ public class GameClientControllerRegistry {
                 .stream()
                 .filter(
                         c ->
-                                c.getName().equalsIgnoreCase(class_name) || c.getSimpleName().equalsIgnoreCase(class_name)
+                                c.getName().equalsIgnoreCase(class_name)
+                                        || c.getSimpleName().equalsIgnoreCase(class_name)
                 )
                     .findFirst();
     }

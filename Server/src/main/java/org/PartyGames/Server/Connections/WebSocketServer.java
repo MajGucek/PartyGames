@@ -1,6 +1,7 @@
 package org.PartyGames.Server.Connections;
 
 
+import com.fasterxml.uuid.Generators;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
 import org.java_websocket.WebSocket;
@@ -8,7 +9,8 @@ import org.java_websocket.handshake.ClientHandshake;
 
 import java.net.InetSocketAddress;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
@@ -28,22 +30,22 @@ public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
     }
 
     @Override
-    public void onOpen(WebSocket web_socket, ClientHandshake clientHandshake) {
-        logger.info("{} entered the room!", web_socket.getRemoteSocketAddress().toString());
+    public void onOpen(WebSocket websocket, ClientHandshake client_handshake) {
+        logger.info("{} entered the room!", websocket.getRemoteSocketAddress().toString());
         NetworkMessage message = new NetworkMessage();
-        String uuid = Client.getUUID();
+        String uuid = getUUID();
         message.setMessageType(MessageType.ClientUUID).setData(uuid);
-        web_socket.send(message.toString());
-        logger.info("Assigned: {} : {}", web_socket.getRemoteSocketAddress().toString(), uuid);
+        websocket.send(message.toString());
+        logger.info("Assigned: {} : {}", websocket.getRemoteSocketAddress().toString(), uuid);
     }
 
     @Override
-    public void onClose(WebSocket web_socket, int code, String reason, boolean remote) {
-        logger.info("{} has left the room!", web_socket.getRemoteSocketAddress().toString());
+    public void onClose(WebSocket websocket, int code, String reason, boolean remote) {
+        logger.info("{} has left the room!", websocket.getRemoteSocketAddress().toString());
     }
 
     @Override
-    public void onMessage(WebSocket web_socket, String message) {
+    public void onMessage(WebSocket websocket, String message) {
         messages.add(message);
     }
 
@@ -66,7 +68,7 @@ public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
             // synchronized is a blocking block {}
             // So, take snapshot, than remove everything out of the messages.
 
-            messages.forEach((message) -> {
+            messages.forEach(message -> {
                 try {
                     NetworkMessage data = NetworkMessage.fromString(message);
                     snapshot.add(data);
@@ -87,4 +89,8 @@ public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
         messages.clear();
     }
 
+
+    private static String getUUID() {
+        return Generators.defaultTimeBasedGenerator().generate().toString();
+    }
 }

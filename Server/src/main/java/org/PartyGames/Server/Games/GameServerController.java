@@ -20,7 +20,7 @@ public abstract class GameServerController {
 
     public boolean isFinished() { return is_finished; }
 
-    public void start() {}
+    public void start() { }
     public void stop() { is_finished = true; }
 
     public abstract void handleGame(List<NetworkMessage> messages);

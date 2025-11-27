@@ -3,10 +3,12 @@ package org.PartyGames.Server.Games.Lobby;
 import org.PartyGames.Server.Games.GameServerController;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
-import org.PartyGames.Server.Connections.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Lobby extends GameServerController {
     private static final Logger logger = LoggerFactory.getLogger(Lobby.class);
@@ -44,7 +46,7 @@ public class Lobby extends GameServerController {
                     if (data == null) { continue; }
 
                     // Handle for Client name, either the name isn't or is already registered
-                    if (client_names.containsValue(data))  {
+                    if (client_names.containsValue(data)) {
                         // this name is already registered, deny the client
                         NetworkMessage message = new NetworkMessage();
                         message.setMessageType(MessageType.ClientError)
@@ -97,6 +99,7 @@ public class Lobby extends GameServerController {
                         }
                     }
                 }
+                default -> { }
             }
         }
 

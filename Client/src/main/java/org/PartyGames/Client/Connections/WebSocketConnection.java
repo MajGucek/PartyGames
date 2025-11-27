@@ -80,7 +80,7 @@ public class WebSocketConnection extends WebSocketClient {
     }
 
     @Override
-    public void onOpen(ServerHandshake serverHandshake) {
+    public void onOpen(ServerHandshake server_handshake) {
         NetworkMessage message = new NetworkMessage();
         message.setMessageType(MessageType.NetworkStatus).setData("Connected to server!");
         server_messages.add(message);
@@ -94,7 +94,7 @@ public class WebSocketConnection extends WebSocketClient {
             NetworkMessage message = NetworkMessage.fromString(data);
             server_messages.add(message);
         } catch (ParseException e) {
-          logger.error("Parse Error: {}", String.valueOf(e));
+            logger.error("Parse Error: {}", String.valueOf(e));
         }
     }
 
@@ -117,6 +117,7 @@ public class WebSocketConnection extends WebSocketClient {
         server_messages.add(message);
         is_connected = false;
     }
+
 
     public boolean isConnected() {
         return is_connected;

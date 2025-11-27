@@ -8,13 +8,13 @@ import java.util.Optional;
 import java.util.Set;
 
 /** Thread-Safe Singleton for getting all Classes that Extend GameClientController */
-class GameClientControllerRegistry {
+public class GameClientControllerRegistry {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(GameClientControllerRegistry.class);
     private static volatile GameClientControllerRegistry instance;
 
     private final Set<Class<? extends GameClientController>> controllers;
 
-    public GameClientControllerRegistry() {
+    private GameClientControllerRegistry() {
         Reflections reflections = new Reflections("org.PartyGames.Client.Games");
         this.controllers = reflections.getSubTypesOf(GameClientController.class);
         this.controllers.forEach(c -> {

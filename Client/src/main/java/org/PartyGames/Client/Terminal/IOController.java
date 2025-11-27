@@ -41,13 +41,14 @@ public class IOController {
         logger.info("IOController registered on OS: {}", System.getProperty("os.name").toLowerCase());
         DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
         if (isLinuxOS()) {
-            defaultTerminalFactory.setForceTextTerminal(true);
+            //defaultTerminalFactory.setForceTextTerminal(true);
         }
         defaultTerminalFactory.setTerminalEmulatorTitle("Party Games");
         try {
             Terminal terminal = defaultTerminalFactory.createTerminal();
             logger.info("Created terminal off type: {}", terminal.getClass().getSimpleName());
             if (terminal instanceof SwingTerminalFrame frame) {
+
                 logger.info("Using SwingTerminalFrame!");
                 frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
                 frame.setResizable(false);
@@ -60,6 +61,8 @@ public class IOController {
 
                     }
                 });
+
+
             }
 
             screen = new TerminalScreen(terminal);

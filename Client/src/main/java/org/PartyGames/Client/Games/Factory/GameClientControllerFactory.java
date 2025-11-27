@@ -12,8 +12,10 @@ import java.lang.reflect.InvocationTargetException;
 public class GameClientControllerFactory {
     private static final Logger logger = LoggerFactory.getLogger(GameClientControllerFactory.class);
 
+    public GameClientControllerFactory() {}
+
     @NotNull
-    public GameClientController createGameClientController(String game_controller, IOController io_controller, WebSocketConnection connection, String uuid)
+    public GameClientController createGameClientController(String game_controller, IOController io_controller, WebSocketConnection connection, String uuid, int TPS)
     throws IllegalArgumentException
     {
         try {
@@ -35,7 +37,7 @@ public class GameClientControllerFactory {
                         return new IllegalArgumentException("game_controller not found");
                     })
                     .getDeclaredConstructor().newInstance()
-                    .attachIOController(io_controller).attachWebSocketConnection(connection).attachUUID(uuid);
+                    .attachIOController(io_controller).attachWebSocketConnection(connection).attachUUID(uuid).attachTPS(TPS);
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             logger.error("Cannot create newInstance of: {}", game_controller);

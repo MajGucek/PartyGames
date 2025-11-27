@@ -46,24 +46,12 @@ public class WebSocketConnection extends WebSocketClient {
 
 
     public void restart() {
-        logger.warn("Restarting connection!");
-        try {
-            closeBlocking();
-        } catch (InterruptedException e) {
-            logger.error("closeBlocking() Error: {}", String.valueOf(e));
-        }
-
         synchronized (server_messages) {
             server_messages.clear();
         }
         is_connected = false;
 
-        try {
-            connectBlocking();
-            logger.info("Reconnected to the server!");
-        } catch (InterruptedException e) {
-            logger.error("Failed to reconnect: {}", String.valueOf(e));
-        }
+        reconnect();
     }
 
 
@@ -97,6 +85,7 @@ public class WebSocketConnection extends WebSocketClient {
         message.setMessageType(MessageType.NetworkStatus).setData("Connected to server!");
         server_messages.add(message);
         is_connected = true;
+        logger.info("Opened connection!");
     }
 
     @Override

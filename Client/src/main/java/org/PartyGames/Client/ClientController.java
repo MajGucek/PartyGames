@@ -16,20 +16,24 @@ import org.slf4j.LoggerFactory;
 
 public class ClientController {
     private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
+    private final int TPS;
     private String uuid;
     private long last_reconnect_attempt;
     private final IOController io_controller;
     private final WebSocketConnection connection;
     private GameClientController game_controller;
-    GameClientControllerFactory game_controller_factory;
+    private final GameClientControllerFactory game_controller_factory;
+    private long current_tick;
 
-    public ClientController(WebSocketConnection connection, IOController io_controller) {
+    public ClientController(WebSocketConnection connection, IOController io_controller, int TPS) {
+        this.TPS = TPS;
         this.uuid = "";
         last_reconnect_attempt = 0;
         this.io_controller = io_controller;
         this.connection = connection;
         this.game_controller = null;
         this.game_controller_factory = new GameClientControllerFactory();
+        this.current_tick = 0;
     }
 
     private void checkConnectionTryReconnect()  {
@@ -46,7 +50,7 @@ public class ClientController {
     public void start() {
         connection.start();
         io_controller.start();
-        this.game_controller = game_controller_factory.createGameClientController("NullGame", io_controller, connection, uuid);
+        this.game_controller = game_controller_factory.createGameClientController("NullGame", io_controller, connection, uuid, TPS);
         game_controller.start();
         logger.info("Width: {}", io_controller.getCharWidth());
         logger.info("Height: {}", io_controller.getCharHeight());
@@ -87,7 +91,7 @@ public class ClientController {
                     if (!new_game_name.equals(game_controller.getClass().getSimpleName())) {
                         game_controller.stop();
                         logger.info("Going to NewGame to: {}", new_game_name);
-                        game_controller = game_controller_factory.createGameClientController(new_game_name, io_controller, connection, uuid);
+                        game_controller = game_controller_factory.createGameClientController(new_game_name, io_controller, connection, uuid, TPS);
                         game_controller.start();
                     }
                 }
@@ -98,7 +102,7 @@ public class ClientController {
                     if (!message_game.equals(game_controller.getClass().getSimpleName())) {
                         game_controller.stop();
                         logger.info("Switching Games to: {}", message_game);
-                        game_controller = game_controller_factory.createGameClientController(message_game, io_controller, connection, uuid);
+                        game_controller = game_controller_factory.createGameClientController(message_game, io_controller, connection, uuid, TPS);
                         game_controller.start();
                     } else {
                         // everything is ok, game is set correctly, respond back to server.
@@ -110,7 +114,8 @@ public class ClientController {
             }
             messages_for_game.add(action);
         }
-        game_controller.handleGame(messages_for_game);
+        game_controller.handleGame(messages_for_game, (int) (current_tick % TPS));
+        current_tick++;
     }
 
 

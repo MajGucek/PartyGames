@@ -70,7 +70,7 @@ public class Lobby extends GameClientController {
     }
 
     @Override
-    public void handleGame(List<NetworkMessage> messages) {
+    public void handleGame(List<NetworkMessage> messages, int tick) {
         processServerMessages(messages);
         processIO();
         io_controller.render();

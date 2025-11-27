@@ -9,7 +9,8 @@ import java.util.List;
 
 @SuppressWarnings("unused")
 public class NullGame extends GameClientController {
-    protected static final Logger logger = LoggerFactory.getLogger(NullGame.class);
+    private static final Logger logger = LoggerFactory.getLogger(NullGame.class);
+
     public NullGame() {
         super();
         logger.warn("You've instantiated a NullGame Object, Beware!");
@@ -26,9 +27,9 @@ public class NullGame extends GameClientController {
     }
 
     @Override
-    public void handleGame(List<NetworkMessage> messages) {
+    public void handleGame(List<NetworkMessage> messages, int tick) {
+        io_controller.clearScreen();
         io_controller.drawText(2, 5, "Waiting for a Connection!", "rgb(255, 255, 255)");
         io_controller.render();
-        logger.warn("You're handling the NullGame, Beware!");
     }
 }

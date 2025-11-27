@@ -13,7 +13,7 @@ class GameServerControllerRegistry {
 
     private final Set<Class<? extends GameServerController>> controllers;
 
-    public GameServerControllerRegistry() {
+    private GameServerControllerRegistry() {
         Reflections reflections = new Reflections("org.PartyGames.Server.Games");
         this.controllers = reflections.getSubTypesOf(GameServerController.class);
         this.controllers.forEach(c -> {

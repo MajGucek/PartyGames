@@ -13,11 +13,13 @@ public abstract class GameClientController {
     protected IOController io_controller;
     protected WebSocketConnection connection;
     protected String uuid;
+    protected int TPS;
 
     public GameClientController() {
         this.io_controller = null;
         this.connection = null;
         this.uuid = null;
+        this.TPS = 60;
     }
 
     public GameClientController attachIOController(IOController io_controller) {
@@ -30,6 +32,10 @@ public abstract class GameClientController {
     }
     public GameClientController attachUUID(String uuid) {
         this.uuid = uuid;
+        return this;
+    }
+    public GameClientController attachTPS(int TPS) {
+        this.TPS = TPS;
         return this;
     }
 
@@ -52,5 +58,5 @@ public abstract class GameClientController {
         io_controller.clearScreen();
     }
 
-    public abstract void handleGame(List<NetworkMessage> messages);
+    public abstract void handleGame(List<NetworkMessage> messages, int tick);
 }

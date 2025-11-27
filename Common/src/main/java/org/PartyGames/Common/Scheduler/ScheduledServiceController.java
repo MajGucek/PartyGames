@@ -1,7 +1,5 @@
-package org.PartyGames.Client.Scheduler;
+package org.PartyGames.Common.Scheduler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +7,6 @@ import java.util.Objects;
 
 @SuppressWarnings("unused")
 public class ScheduledServiceController {
-    private static final Logger logger = LoggerFactory.getLogger(ScheduledServiceController.class);
     private final int TPS;
     private final List<ServiceWrapper> service_list;
 
@@ -26,7 +23,6 @@ public class ScheduledServiceController {
 
     public void addService(String name, Service service, int tps) {
         service_list.add(new ServiceWrapper(name, service, tps));
-        logger.info("Added service: {}", name);
     }
     public void addService(Service service, int tps) {
         service_list.add(new ServiceWrapper("", service, tps));
@@ -45,3 +41,4 @@ public class ScheduledServiceController {
             }});
     }
 }
+

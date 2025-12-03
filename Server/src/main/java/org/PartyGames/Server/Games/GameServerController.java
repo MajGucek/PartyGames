@@ -7,14 +7,20 @@ import java.util.List;
 
 public abstract class GameServerController {
     protected WebSocketServer connection;
+    protected int TPS;
     protected boolean is_finished;
     public GameServerController() {
         this.connection = null;
+        this.TPS = 0;
         is_finished = false;
     }
 
     public GameServerController attachWebSocketServer(WebSocketServer connection) {
         this.connection = connection;
+        return this;
+    }
+    public GameServerController attachTPS(int TPS) {
+        this.TPS = TPS;
         return this;
     }
 
@@ -23,6 +29,6 @@ public abstract class GameServerController {
     public void start() { }
     public void stop() { is_finished = true; }
 
-    public abstract void handleGame(List<NetworkMessage> messages);
+    public abstract void handleGame(List<NetworkMessage> messages, int tick);
 
 }

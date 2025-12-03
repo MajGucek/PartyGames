@@ -31,7 +31,7 @@ public class GameServerControllerFactory {
     }
 
     @NotNull
-    public GameServerController createGameServerController(String game_controller, WebSocketServer connection)
+    public GameServerController createGameServerController(String game_controller, WebSocketServer connection, int TPS)
             throws IllegalArgumentException
     {
         try {
@@ -44,7 +44,7 @@ public class GameServerControllerFactory {
                                 return new IllegalArgumentException("game_controller not found");
                             })
                             .getDeclaredConstructor().newInstance()
-                            .attachWebSocketServer(connection);
+                            .attachWebSocketServer(connection).attachTPS(TPS);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             logger.error("Cannot create newInstance of: {}", game_controller);
         } catch (NoSuchMethodException e) {

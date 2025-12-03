@@ -7,13 +7,13 @@ import java.util.concurrent.TimeUnit;
 final class Main {
     static void main() {
         int port = 8887;
-        ServerController game = new ServerController(port);
+        final int TPS = 240;
+        ServerController game = new ServerController(port, TPS);
         game.start();
         try {
             Thread.sleep(2000);
         } catch (InterruptedException _) { }
 
-        final int TPS = 240;
         final long PERIOD_NANO = 1_000_000_000L / TPS;
 
         @SuppressWarnings("used without")

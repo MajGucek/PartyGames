@@ -30,7 +30,7 @@ public class Lobby extends GameServerController {
     }
 
     @Override
-    public void handleGame(List<NetworkMessage> messages) {
+    public void handleGame(List<NetworkMessage> messages, int tick) {
         // Iterate over messages
         for (NetworkMessage action : messages) {
             if (action.getMessageType().equals(MessageType.Invalid)) { continue; }

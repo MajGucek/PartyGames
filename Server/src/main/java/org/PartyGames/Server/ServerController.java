@@ -11,16 +11,20 @@ import org.slf4j.LoggerFactory;
 
 public class ServerController {
     private static final Logger logger = LoggerFactory.getLogger(ServerController.class);
+    private final int TPS;
     private final WebSocketServer connection;
     private GameServerController game_controller;
     private long last_time_sent_game;
     private final GameServerControllerFactory game_server_controller_factory;
+    private long current_tick;
 
-    public ServerController(int port) {
+    public ServerController(int port, int TPS) {
         connection = new WebSocketServer(port);
         game_server_controller_factory = new GameServerControllerFactory();
-        game_controller = game_server_controller_factory.createGameServerController("Lobby", connection);
+        game_controller = game_server_controller_factory.createGameServerController("Lobby", connection, TPS);
         last_time_sent_game = 0;
+        this.TPS = TPS;
+        this.current_tick = 0;
     }
 
     private void notifyOfGameStrategy(String game) {
@@ -53,7 +57,8 @@ public class ServerController {
 
             game_controller = game_server_controller_factory.createGameServerController(
                     game_server_controller_factory.getRandomGame(),
-                    connection
+                    connection,
+                    TPS
             );
 
             logger.info("Created Game: {}", game_controller.getClass().getSimpleName());
@@ -66,9 +71,9 @@ public class ServerController {
             game_controller.start();
         }
 
-        game_controller.handleGame(connection.consumeMessages());
+        game_controller.handleGame(connection.consumeMessages(), (int) (current_tick % TPS));
         notifyOfGameStrategy(game_controller.getClass().getSimpleName());
-
+        current_tick++;
     }
     public void shutdown() {
         try {

@@ -7,7 +7,7 @@ Projekt temelji na WebSocket komunikaciji in knjižnici Lanterna ter ponuja splo
 
 ## Overview
 
-Orodje za ustvarjanje Sprite-ov [`Party Games`](https://github.com/MajGucek/Spriter)
+Orodje za ustvarjanje Sprite-ov [`Spriter`](https://github.com/MajGucek/Spriter)
 
 Za implementacijo nove igre sta potrebna le dva razreda:
 

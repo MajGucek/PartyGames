@@ -11,6 +11,7 @@ import org.PartyGames.Common.Networking.NetworkMessage;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,78 +65,78 @@ public class ClientController {
 
 
     public void update() {
-        checkConnectionTryReconnect();
-        List<NetworkMessage> messages_for_game = new ArrayList<>();
-        List<NetworkMessage> server_messages = connection.consumeMessages();
-        if (server_messages == null) {
-            checkConnectionTryReconnect();
-            return;
-        }
-        GameClientControllerFactory game_controller_factory = new GameClientControllerFactory();
-        for (NetworkMessage action : server_messages) {
-            if (!uuid.isEmpty()) {
-                String addr = action.getAddress();
-                if (addr == null) {
-                    continue;
-                }
-                if (!(action.isBroadcast() || action.getAddress().equalsIgnoreCase(uuid))) {
-                    continue;
-                }
-            }
-            MessageType message_type = action.getMessageType();
-            switch (message_type) {
-                case MessageType.NetworkStatus -> logger.info("Network Status: {}", action.getData());
-                
-                case MessageType.ClientUUID -> {
-                    String data = action.getData();
-                    if (data == null) { continue; }
-                    uuid = data;
-                    logger.info("Got UUID: {}", uuid);
-                }
-                case MessageType.NewGame -> {
-                    String new_game_name = action.getData();
-                    if (new_game_name == null) { continue; }
-
-                    if (!new_game_name.equals(game_controller.getClass().getSimpleName())) {
-                        game_controller.stop();
-                        logger.info("Going to NewGame to: {}", new_game_name);
-                        game_controller = game_controller_factory.createGameClientController(
-                                new_game_name,
-                                io_controller,
-                                connection,
-                                uuid,
-                                TPS
-                        );
-                        game_controller.start();
-                    }
-                }
-                case MessageType.GameStatus -> {
-                    String message_game = action.getData();
-                    if (message_game == null) { continue; }
-
-                    if (!message_game.equals(game_controller.getClass().getSimpleName())) {
-                        game_controller.stop();
-                        logger.info("Switching Games to: {}", message_game);
-                        game_controller = game_controller_factory.createGameClientController(
-                                message_game,
-                                io_controller,
-                                connection,
-                                uuid,
-                                TPS
-                        );
-                        game_controller.start();
-                    } else {
-                        // everything is ok, game is set correctly, respond back to server.
-                        NetworkMessage message = new NetworkMessage();
-                        message.setAddress(uuid).setMessageType(MessageType.ClientStatus).setData("ACK");
-                        connection.send(message);
-                    }
-                }
-                default -> messages_for_game.add(action);
-            }
-        }
-        game_controller.handleGame(messages_for_game, (int) (current_tick % TPS));
         current_tick++;
+        List<NetworkMessage> messages_for_game = new ArrayList<>();
+        try {
+            List<NetworkMessage> server_messages = connection.consumeMessages();
+            GameClientControllerFactory game_controller_factory = new GameClientControllerFactory();
+            for (NetworkMessage action : server_messages) {
+                if (!uuid.isEmpty()) {
+                    String addr = action.getAddress();
+                    if (addr == null) {
+                        continue;
+                    }
+                    if (!(action.isBroadcast() || action.getAddress().equalsIgnoreCase(uuid))) {
+                        continue;
+                    }
+                }
+                MessageType message_type = action.getMessageType();
+                switch (message_type) {
+                    case MessageType.NetworkStatus -> logger.info("Network Status: {}", action.getData());
+
+                    case MessageType.ClientUUID -> {
+                        String data = action.getData();
+                        if (data == null) { continue; }
+                        uuid = data;
+                        logger.info("Got UUID: {}", uuid);
+                    }
+                    case MessageType.NewGame -> {
+                        String new_game_name = action.getData();
+                        if (new_game_name == null) { continue; }
+
+                        if (!new_game_name.equals(game_controller.getClass().getSimpleName())) {
+                            game_controller.stop();
+                            logger.info("Going to NewGame to: {}", new_game_name);
+                            game_controller = game_controller_factory.createGameClientController(
+                                    new_game_name,
+                                    io_controller,
+                                    connection,
+                                    uuid,
+                                    TPS
+                            );
+                            game_controller.start();
+                        }
+                    }
+                    case MessageType.GameStatus -> {
+                        String message_game = action.getData();
+                        if (message_game == null) { continue; }
+
+                        if (!message_game.equals(game_controller.getClass().getSimpleName())) {
+                            game_controller.stop();
+                            logger.info("Switching Games to: {}", message_game);
+                            game_controller = game_controller_factory.createGameClientController(
+                                    message_game,
+                                    io_controller,
+                                    connection,
+                                    uuid,
+                                    TPS
+                            );
+                            game_controller.start();
+                        } else {
+                            // everything is ok, game is set correctly, respond back to server.
+                            NetworkMessage message = new NetworkMessage();
+                            message.setAddress(uuid).setMessageType(MessageType.ClientStatus).setData("ACK");
+                            connection.send(message);
+                        }
+                    }
+                    default -> messages_for_game.add(action);
+                }
+            }
+        } catch (WebsocketNotConnectedException e) {
+            checkConnectionTryReconnect();
+        }
+
+        game_controller.handleGame(messages_for_game, (int) (current_tick % TPS));
     }
 
 

@@ -66,10 +66,9 @@ public class WebSocketConnection extends WebSocketClient {
 
     public List<NetworkMessage> consumeMessages() throws WebsocketNotConnectedException {
         if (!isConnected()) {
-            logger.error("The Client isn't connected to the server!");
             is_connected = false;
             restart();
-            return null;
+            throw new WebsocketNotConnectedException();
         }
 
         synchronized (server_messages) {

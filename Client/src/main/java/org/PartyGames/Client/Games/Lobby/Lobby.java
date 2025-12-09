@@ -20,19 +20,15 @@ public class Lobby extends GameClientController {
     private boolean was_name_denied;
     private boolean vote_start_games;
 
-    public Lobby() {
-        super();
-        this.unconfirmed_name = "";
-        this.confirmed_name = "";
-        has_sent_name = false;
-        is_name_registered = false;
-        was_name_denied = false;
-        vote_start_games = false;
-    }
-
     @Override
     public void start() {
         super.start();
+        this.unconfirmed_name = "";
+        this.confirmed_name = "";
+        this.has_sent_name = false;
+        this.is_name_registered = false;
+        this.was_name_denied = false;
+        this.vote_start_games = false;
         logger.info("Entered Lobby!");
     }
 

@@ -4,10 +4,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-final class Main {
+final class Server {
     static void main() {
         int port = 8887;
-        final int TPS = 240;
+        final int TPS = 60;
         ServerController game = new ServerController(port, TPS);
         game.start();
         try {
@@ -26,5 +26,5 @@ final class Main {
 
         executor.scheduleAtFixedRate(game::update, 0, PERIOD_NANO, TimeUnit.NANOSECONDS);
     }
-    private Main() { }
+    private Server() { }
 }

@@ -2,6 +2,7 @@ package org.PartyGames.Client.Games.NullGame;
 
 import org.PartyGames.Client.Games.GameClientController;
 import org.PartyGames.Common.Networking.NetworkMessage;
+import org.PartyGames.Common.Scheduler.ScheduledServiceController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,15 +11,15 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class NullGame extends GameClientController {
     private static final Logger logger = LoggerFactory.getLogger(NullGame.class);
-
-    public NullGame() {
-        super();
-        logger.warn("You've instantiated a NullGame Object, Beware!");
-    }
+    private ScheduledServiceController scheduler;
 
     @Override
     public void start() {
         super.start();
+        logger.warn("You've instantiated a NullGame Object, Beware!");
+
+        this.scheduler = new ScheduledServiceController(super.TPS);
+        scheduler.addService("Remained", () -> logger.warn("Handling NullGame"), 1);
     }
 
     @Override
@@ -31,5 +32,6 @@ public class NullGame extends GameClientController {
         io_controller.clearScreen();
         io_controller.drawText(2, 5, "Waiting for a Connection!", "rgb(255, 255, 255)");
         io_controller.render();
+        scheduler.executeServices(tick);
     }
 }

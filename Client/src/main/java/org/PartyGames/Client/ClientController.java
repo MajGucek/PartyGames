@@ -122,11 +122,6 @@ public class ClientController {
                                     TPS
                             );
                             game_controller.start();
-                        } else {
-                            // everything is ok, game is set correctly, respond back to server.
-                            NetworkMessage message = new NetworkMessage();
-                            message.setAddress(uuid).setMessageType(MessageType.ClientStatus).setData("ACK");
-                            connection.send(message);
                         }
                     }
                     default -> messages_for_game.add(action);

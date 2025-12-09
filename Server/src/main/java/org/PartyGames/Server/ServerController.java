@@ -20,10 +20,10 @@ public class ServerController {
 
     public ServerController(int port, int TPS) {
         connection = new WebSocketServer(port);
+        this.TPS = TPS;
         game_server_controller_factory = new GameServerControllerFactory();
         game_controller = game_server_controller_factory.createGameServerController("Lobby", connection, TPS);
         last_time_sent_game = 0;
-        this.TPS = TPS;
         this.current_tick = 0;
     }
 

@@ -9,7 +9,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
-final class Main {
+final class Client {
     static void main() {
         String server_address = "ws://localhost:8887";
         final int TPS = 60;
@@ -37,5 +37,5 @@ final class Main {
 
     }
 
-    private Main() { }
+    private Client() { }
 }

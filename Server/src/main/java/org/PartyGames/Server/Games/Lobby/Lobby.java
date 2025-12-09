@@ -13,19 +13,16 @@ import java.util.Map;
 public class Lobby extends GameServerController {
     private static final Logger logger = LoggerFactory.getLogger(Lobby.class);
     /** Map: Client-ID -> Client-Name */
-    private final Map<String, String> client_names;
+    private Map<String, String> client_names;
     /** Map: Client-ID -> if it has voted */
-    private final Map<String, Boolean> client_votes;
+    private Map<String, Boolean> client_votes;
 
-    public Lobby() {
-        super();
-        client_names = new HashMap<>();
-        client_votes = new HashMap<>();
-    }
 
     @Override
     public void start() {
         super.start();
+        client_names = new HashMap<>();
+        client_votes = new HashMap<>();
         logger.info("Now in Lobby");
     }
 
@@ -117,7 +114,6 @@ public class Lobby extends GameServerController {
         if (end_lobby && !client_votes.isEmpty()) {
             stop();
         }
-
 
     }
 

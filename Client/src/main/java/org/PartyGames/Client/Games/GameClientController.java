@@ -19,7 +19,7 @@ public abstract class GameClientController {
         this.io_controller = null;
         this.connection = null;
         this.uuid = null;
-        this.TPS = 60;
+        this.TPS = 0;
     }
 
     public GameClientController attachIOController(IOController io_controller) {

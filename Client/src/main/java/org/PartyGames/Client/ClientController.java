@@ -58,9 +58,9 @@ public class ClientController {
                 uuid,
                 TPS
         );
-        game_controller.start();
         logger.info("Width: {}", io_controller.getCharWidth());
         logger.info("Height: {}", io_controller.getCharHeight());
+        game_controller.start();
     }
 
 

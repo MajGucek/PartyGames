@@ -3,6 +3,7 @@ package org.PartyGames.Client.Games.Lobby;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import org.PartyGames.Client.Games.GameClientController;
+import org.PartyGames.Client.Terminal.IOController;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
 import org.slf4j.Logger;
@@ -134,25 +135,25 @@ public class Lobby extends GameClientController {
 
         if (has_sent_name && !is_name_registered) {
             if (was_name_denied) {
-                io_controller.drawText(0, 5, "Your name was denied!", "rgb(255, 0, 0)");
-                io_controller.drawText(0, 6, "Press Enter to re-enter name", "rgb(255, 255, 255)");
+                io_controller.drawText("Your name was denied!", 0, 5, IOController.getRGB(255, 0, 0));
+                io_controller.drawText("Press Enter to re-enter name", 0, 6);
             } else {
-                io_controller.drawText(0, 5, "You have sent Name: "
+                io_controller.drawText("You have sent Name: "
                         + unconfirmed_name +
-                        ", Waiting for response", "rgb(255, 0, 255)");
+                        ", Waiting for response", 0, 5, IOController.getRGB(255, 0, 255));
             }
 
         } else if (!has_sent_name && !is_name_registered) {
-            io_controller.drawText(0, 5, "Input Name: " + unconfirmed_name, "rgb(255, 125, 255)");
+            io_controller.drawText("Input Name: " + unconfirmed_name, 0, 5, IOController.getRGB(255, 125, 255));
         }
 
         if (is_name_registered && !confirmed_name.isEmpty()) {
-            io_controller.drawText(4, 2, "Your Name: " + confirmed_name, "rgb(0, 255, 0)");
-            io_controller.drawText(4, 3, "Press y/n to vote to start/remove your vote", "rgb(255, 255, 255)");
+            io_controller.drawText("Your Name: " + confirmed_name, 4, 2, IOController.getRGB(0, 255, 0));
+            io_controller.drawText("Press y/n to vote to start/remove your vote", 4, 3);
             if (vote_start_games) {
-                io_controller.drawText(11, 4, "Yes", "rgb(0, 0, 255)");
+                io_controller.drawText("Yes", 11, 4, IOController.getRGB(0, 0, 255));
             } else {
-                io_controller.drawText(11, 4, "No", "rgb(255, 0, 0)");
+                io_controller.drawText("No", 11, 4, IOController.getRGB(255, 0, 0));
             }
         }
     }

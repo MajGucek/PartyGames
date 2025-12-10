@@ -14,10 +14,12 @@ import com.googlecode.lanterna.terminal.Terminal;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
+import java.util.stream.IntStream;
 
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
+import com.sun.jdi.ClassNotLoadedException;
+import org.PartyGames.Client.Sprites.Sprite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,15 +91,32 @@ public class IOController {
     }
 
     @SuppressWarnings("unused")
-    public void drawSquare(int x, int y, int w, int h, String color) {
-        graphics.setBackgroundColor(getRGB(color));
+    public void drawSquare(int x, int y, int w, int h, TextColor.RGB color) {
+        graphics.setBackgroundColor(color);
         graphics.fillRectangle(new TerminalPosition(x, y), new TerminalSize(w, h), ' ');
     }
 
-
-    public void drawText(int x, int y, String text, String color) {
-        graphics.setForegroundColor(getRGB(color));
+    public void drawText(String text, int x, int y, TextColor.RGB color) {
+        graphics.setForegroundColor(color);
         graphics.putString(new TerminalPosition(x, y), text);
+    }
+
+    public void drawText(String text, int x, int y) {
+        drawText(text, x, y, getRGB(255, 255, 255));
+    }
+
+    public void drawSprite(Sprite sprite, int index, int x, int y, TextColor.RGB color) {
+        try {
+            List<String> rows = sprite.getSprite().get(index);
+
+            IntStream.range(0, rows.size()).forEach(i -> drawText(rows.get(i), x, y + i, color));
+        } catch (ClassNotLoadedException e) {
+            logger.error("Cannot getSprite: {}", String.valueOf(e));
+        }
+    }
+    @SuppressWarnings("unused")
+    public void drawSprite(Sprite sprite, int index, int x, int y) {
+        drawSprite(sprite, index, x, y, getRGB(255, 255, 255));
     }
     
     public void hideCursor() {
@@ -141,25 +160,6 @@ public class IOController {
         } catch (IOException e) {
             logger.error("Error polling inputs: {}", String.valueOf(e));
         }
-        return null;
-    }
-
-    // Source - https://stackoverflow.com/a/7614202
-    // Posted by Confluence, modified by community. See post 'Timeline' for change history
-    // Retrieved 2025-11-06, License - CC BY-SA 3.0
-    @Deprecated
-    public static TextColor.RGB getRGB(String input)
-    {
-        Pattern c = Pattern.compile("rgb *\\( *([0-9]+), *([0-9]+), *([0-9]+) *\\)");
-        Matcher m = c.matcher(input);
-
-        if (m.matches()) {
-            return new TextColor.RGB(
-                    Integer.parseInt(m.group(1)),
-                    Integer.parseInt(m.group(2)),
-                    Integer.parseInt(m.group(3)));
-        }
-        logger.error("The input isn't formatted correctly! {}", input);
         return null;
     }
 

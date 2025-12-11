@@ -22,6 +22,7 @@ public class Sprite {
     protected List<List<String>> sprite;
     protected int current_frame;
 
+
     public Sprite() {
         this.file_name = null;
         this.frame_count = 0;

@@ -7,14 +7,21 @@ import java.util.Objects;
 
 @SuppressWarnings("unused")
 public class ScheduledServiceController {
-    private final int TPS;
     private final List<ServiceWrapper> service_list;
+    private boolean initialized;
+    private int TPS;
 
     private record ServiceWrapper(String name, Service service, int TPS) { }
 
-    public ScheduledServiceController(int TPS) {
-        this.TPS = TPS;
+    public ScheduledServiceController() {
+        this.TPS = 0;
         service_list = new LinkedList<>();
+        this.initialized = false;
+    }
+
+    public void start(int tps) {
+        this.initialized = true;
+        this.TPS = tps;
     }
 
     public interface Service {
@@ -28,6 +35,9 @@ public class ScheduledServiceController {
         service_list.add(new ServiceWrapper("", service, tps));
     }
     public void removeService(String name) {
+        if (!initialized) {
+            throw new IllegalStateException("Scheduler not started - please call .start() not in constructor!");
+        }
         if (Objects.equals(name, "")) {
             throw new IllegalArgumentException("Cannot remove Service with no name!");
         }
@@ -35,6 +45,9 @@ public class ScheduledServiceController {
     }
 
     public void executeServices(int tick) {
+        if (!initialized) {
+            throw new IllegalStateException("Scheduler not started - please call .start() not in constructor!");
+        }
         service_list.forEach(service -> {
             if (tick % (TPS / service.TPS) == 0) {
                 service.service.execute();

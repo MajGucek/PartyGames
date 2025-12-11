@@ -1,6 +1,8 @@
 package org.PartyGames.Client.Games.NullGame;
 
 import org.PartyGames.Client.Games.GameClientController;
+import org.PartyGames.Client.Sprites.Sprite;
+import org.PartyGames.Client.Terminal.IOController;
 import org.PartyGames.Common.Networking.NetworkMessage;
 import org.PartyGames.Common.Scheduler.ScheduledServiceController;
 import org.slf4j.Logger;
@@ -30,7 +32,9 @@ public class NullGame extends GameClientController {
     @Override
     public void handleGame(List<NetworkMessage> messages, int tick) {
         io_controller.clearScreen();
-        io_controller.drawText(2, 5, "Waiting for a Connection!", "rgb(255, 255, 255)");
+        io_controller.drawSprite(penguin, 2, 6, IOController.getRGB(255, 255, 255));
+        io_controller.drawSprite(dancer, 20, 6);
+        io_controller.drawText("Waiting for a Connection!", 2, 2);
         io_controller.render();
         scheduler.executeServices(tick);
     }

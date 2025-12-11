@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
-import com.sun.jdi.ClassNotLoadedException;
 import org.PartyGames.Client.Sprites.Sprite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,18 +104,14 @@ public class IOController {
         drawText(text, x, y, getRGB(255, 255, 255));
     }
 
-    public void drawSprite(Sprite sprite, int index, int x, int y, TextColor.RGB color) {
-        try {
-            List<String> rows = sprite.getSprite().get(index);
-
-            IntStream.range(0, rows.size()).forEach(i -> drawText(rows.get(i), x, y + i, color));
-        } catch (ClassNotLoadedException e) {
-            logger.error("Cannot getSprite: {}", String.valueOf(e));
-        }
+    public void drawSprite(Sprite sprite, int x, int y, TextColor.RGB color) {
+        List<String> rows = sprite.getSprite();
+        IntStream.range(0, rows.size()).forEach(i -> drawText(rows.get(i), x, y + i, color));
     }
+
     @SuppressWarnings("unused")
-    public void drawSprite(Sprite sprite, int index, int x, int y) {
-        drawSprite(sprite, index, x, y, getRGB(255, 255, 255));
+    public void drawSprite(Sprite sprite, int x, int y) {
+        drawSprite(sprite, x, y, getRGB(255, 255, 255));
     }
     
     public void hideCursor() {

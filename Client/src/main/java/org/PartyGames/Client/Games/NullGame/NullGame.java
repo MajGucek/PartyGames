@@ -4,27 +4,39 @@ import org.PartyGames.Client.Games.GameClientController;
 import org.PartyGames.Client.Sprites.Sprite;
 import org.PartyGames.Client.Terminal.IOController;
 import org.PartyGames.Common.Networking.NetworkMessage;
+import org.PartyGames.Common.Scheduler.ScheduledServiceController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 
 @SuppressWarnings("unused")
 public class NullGame extends GameClientController {
     private static final Logger logger = LoggerFactory.getLogger(NullGame.class);
+    private ScheduledServiceController scheduler;
     private Sprite penguin;
+    private Sprite dancer;
+
+    public NullGame() {
+        this.penguin = new Sprite();
+        this.dancer = new Sprite();
+        scheduler = new ScheduledServiceController();
+    }
 
     @Override
     public void start() {
         super.start();
         logger.warn("You've instantiated a NullGame Object, Beware!");
-        penguin = new Sprite("penguin");
         try {
-            penguin.loadSprite();
-        } catch (FileNotFoundException e) {
-            logger.error("File not found! {}", String.valueOf(e));
+            penguin.loadSprite("penguin");
+            dancer.loadSprite("dancer");
+        } catch (Exception e) {
+            logger.error("Couldn't load sprite: {}", String.valueOf(e));
+            System.exit(1);
         }
+
+        scheduler.start(getTPS());
+        scheduler.addService("animate_dancer", () -> dancer.incrementFrame(), 10);
     }
 
     @Override
@@ -35,8 +47,10 @@ public class NullGame extends GameClientController {
     @Override
     public void handleGame(List<NetworkMessage> messages, int tick) {
         io_controller.clearScreen();
-        io_controller.drawSprite(penguin, 0, 2, 6, IOController.getRGB(255, 255, 255));
+        io_controller.drawSprite(penguin, 2, 6, IOController.getRGB(255, 255, 255));
+        io_controller.drawSprite(dancer, 20, 6);
         io_controller.drawText("Waiting for a Connection!", 2, 2);
         io_controller.render();
+        scheduler.executeServices(tick);
     }
 }

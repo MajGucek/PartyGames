@@ -72,6 +72,7 @@ public class Sprite {
                 ).toList();
         if (this.frame_count != this.sprite.size()) {
             throw new ParseException("frame_count does not match actual sprite size!", 21);
+            //
         }
         logger.info("Loaded Sprite: {}, successfully", file_name);
     }

@@ -14,29 +14,14 @@ import java.util.List;
 public class NullGame extends GameClientController {
     private static final Logger logger = LoggerFactory.getLogger(NullGame.class);
     private ScheduledServiceController scheduler;
-    private Sprite penguin;
-    private Sprite dancer;
-
-    public NullGame() {
-        this.penguin = new Sprite();
-        this.dancer = new Sprite();
-        scheduler = new ScheduledServiceController();
-    }
 
     @Override
     public void start() {
         super.start();
         logger.warn("You've instantiated a NullGame Object, Beware!");
-        try {
-            penguin.loadSprite("penguin");
-            dancer.loadSprite("dancer");
-        } catch (Exception e) {
-            logger.error("Couldn't load sprite: {}", String.valueOf(e));
-            System.exit(1);
-        }
 
-        scheduler.start(getTPS());
-        scheduler.addService("animate_dancer", () -> dancer.incrementFrame(), 10);
+        this.scheduler = new ScheduledServiceController(super.TPS);
+        scheduler.addService("Remained", () -> logger.warn("Handling NullGame"), 1);
     }
 
     @Override

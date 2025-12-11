@@ -22,10 +22,6 @@ public abstract class GameClientController {
         this.TPS = 0;
     }
 
-    protected int getTPS() {
-        return TPS;
-    }
-
     public GameClientController attachIOController(IOController io_controller) {
         this.io_controller = io_controller;
         return this;

@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+/** Class that represent Sprite data. */
 public class Sprite {
     private static final Logger logger = LoggerFactory.getLogger(Sprite.class);
     protected String file_name;
@@ -34,14 +34,17 @@ public class Sprite {
     public int getWidth() { return this.width; }
     public int getHeight() { return height; }
 
+    /** Called internally when you call drawSprite().
+     * @return Immutable version on the sprite List!
+     * @throws IllegalStateException The sprite hasn't been correctly loaded! */
     public List<String> getSprite() {
         if (this.sprite == null) {
-            logger.error("Sprite wasn't correctly loaded, returning null!");
+            throw new IllegalStateException("Sprite wasn't correctly loaded, returning null!");
         }
         return Collections.unmodifiableList(this.sprite.get(current_frame));
     }
 
-    @SuppressWarnings("unused")
+    /** Moves Sprite to its next frame in the animation or loops around! */
     public void incrementFrame() {
         if (frame_count == 1) {
             logger.warn("Cannot increment Frame on a Sprite: {} with only 1 frame", this.file_name);
@@ -54,7 +57,9 @@ public class Sprite {
             current_frame = 0;
         }
     }
-
+    /** Try to load the sprite in from the assets folder.
+     * @throws ParseException Sprite wasn't formatted correctly!
+     * @throws FileNotFoundException File wasn't found! */
     public void loadSprite(String file_name) throws ParseException, FileNotFoundException {
         this.file_name = file_name;
         BufferedReader reader = new BufferedReader(new FileReader(getFullFileName(this.file_name)));

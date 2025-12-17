@@ -15,20 +15,23 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import org.PartyGames.Client.Sprites.Sprite;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
+/** Class for handling Input/Output */
 public class IOController {
     private static final Logger logger = LoggerFactory.getLogger(IOController.class);
-    // This is purely for rendering,
+    /** This is purely for rendering */
     private Screen screen;
-    // modify "graphics" and then render the whole thing with screen.refresh()
+    /** modify "graphics" and then render the whole thing with screen.refresh() */
     private TextGraphics graphics;
 
     public IOController() {
@@ -36,7 +39,7 @@ public class IOController {
         graphics = null;
     }
 
-
+    /** Starts the IOController, checks for OS and Terminal Emulator. */
     public void start() {
         logger.info("IOController registered on OS: {}", System.getProperty("os.name").toLowerCase());
         DefaultTerminalFactory default_terminal_factory = new DefaultTerminalFactory();
@@ -62,10 +65,7 @@ public class IOController {
 
                     }
                 });
-
-
             }
-
             screen = new TerminalScreen(terminal);
             screen.startScreen();
             hideCursor();
@@ -77,10 +77,17 @@ public class IOController {
 
 
     public void stop() {
-        screen = null;
+        try {
+            screen.stopScreen();
+        } catch (IOException e) {
+            logger.error("Something went wrong when stopping screen: {}", String.valueOf(e));
+            System.exit(0);
+        } finally {
+            screen = null;
+        }
     }
 
-
+    /** clears screen a.k.a. screen becomes black. */
     public void clearScreen() {
         if (screen != null) {
             screen.clear();
@@ -89,29 +96,52 @@ public class IOController {
         }
     }
 
+    @Deprecated
     @SuppressWarnings("unused")
     public void drawSquare(int x, int y, int w, int h, TextColor.RGB color) {
         graphics.setBackgroundColor(color);
         graphics.fillRectangle(new TerminalPosition(x, y), new TerminalSize(w, h), ' ');
     }
 
+    /** Draws a String to the screen.
+     * @param text The String that gets drawn.
+     * @param x The X starting position of the text.
+     * @param y The Y starting position of the text.
+     * @param color The color of the text. */
     public void drawText(String text, int x, int y, TextColor.RGB color) {
         graphics.setForegroundColor(color);
         graphics.putString(new TerminalPosition(x, y), text);
     }
-
+    /** Draws a String to the screen with white color.
+     * @param text The String that gets drawn.
+     * @param x The X starting position of the text.
+     * @param y The Y starting position of the text. */
     public void drawText(String text, int x, int y) {
         drawText(text, x, y, getRGB(255, 255, 255));
     }
-
+    /** Draws a Sprite to the screen.
+     * @param sprite The Sprite that gets drawn.
+     * @param x The X starting position of the text.
+     * @param y The Y starting position of the text.
+     * @param color The color of the Sprite. */
     public void drawSprite(Sprite sprite, int x, int y, TextColor.RGB color) {
         drawSprite(sprite, x, y, color, false);
     }
-    @SuppressWarnings("unused")
+
+    /** Draws a Sprite to the screen with white color.
+     * @param sprite The Sprite that gets drawn.
+     * @param x The X starting position of the text.
+     * @param y The Y starting position of the text. */
     public void drawSprite(Sprite sprite, int x, int y) {
         drawSprite(sprite, x, y, getRGB(255, 255, 255));
     }
-    @SuppressWarnings("unused")
+
+    /** Draws a Sprite to the screen with white color.
+     * @param sprite The Sprite that gets drawn.
+     * @param x The X starting position of the text.
+     * @param y The Y starting position of the text.
+     * @param color The color of the Sprite.
+     * @param write_over_whitespace Draw the space character and override the background? */
     public void drawSprite(Sprite sprite, int x, int y, TextColor.RGB color, boolean write_over_whitespace) {
         List<String> rows = sprite.getSprite();
 
@@ -154,7 +184,7 @@ public class IOController {
     public int getHorizontalCenter() { return getCharWidth() / 2; }
     public int getVerticalCenter() { return getCharHeight() / 2; }
 
-
+    /** Draws to the screen. */
     public void render() {
         try {
             screen.doResizeIfNecessary();
@@ -164,17 +194,19 @@ public class IOController {
         }
     }
 
-
-    public KeyStroke poll() {
+    /** Get the latest user input.
+     * @return Option, KeyStroke or empty */
+    @NotNull
+    public Optional<KeyStroke> poll() {
         try {
-            return screen.pollInput();
+            return Optional.of(screen.pollInput());
         } catch (IOException e) {
             logger.error("Error polling inputs: {}", String.valueOf(e));
         }
-        return null;
+        return Optional.empty();
     }
 
-    @SuppressWarnings("unused")
+    /** Static method for creating an RGB object. */
     public static TextColor.RGB getRGB(int r, int g, int b) {
         return new TextColor.RGB(r, g, b);
     }

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 @SuppressWarnings("unused")
 public class Lobby extends GameClientController {
@@ -76,9 +77,10 @@ public class Lobby extends GameClientController {
 
     private void processIO() {
         io_controller.clearScreen();
-        KeyStroke input = io_controller.poll();
+        Optional<KeyStroke> input_opt = io_controller.poll();
         StringBuilder string_builder = new StringBuilder(unconfirmed_name);
-        if (input != null) {
+        if (input_opt.isPresent()) {
+            KeyStroke input = input_opt.get();
             switch (input.getKeyType()) {
                 case KeyType.Character -> {
                     if (!has_sent_name) {

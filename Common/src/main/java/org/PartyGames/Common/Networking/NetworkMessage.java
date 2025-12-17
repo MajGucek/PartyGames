@@ -17,7 +17,8 @@ public class NetworkMessage {
     /** Address */
     @Nullable private String address;
 
-    /* Constructors */
+    /** Creates a NetworkMessage Object, by default the address is broadcast.
+     * If Type isn't set the Client/Server will discard the Message! */
     public NetworkMessage() {
         type = MessageType.Invalid;
         data = null;
@@ -56,7 +57,8 @@ public class NetworkMessage {
     /* --Builder Pattern methods-- */
 
     /* Import/Export */
-
+    /** Tries to convert: String -> NetworkMessage {@link NetworkMessage}
+     * {@throws ParseException} */
     public static NetworkMessage fromString(String message) throws ParseException {
         NetworkMessage parsed = gson.fromJson(message, NetworkMessage.class);
         if (parsed != null) {
@@ -66,6 +68,8 @@ public class NetworkMessage {
         }
     }
 
+    /** Tries to convert: NetworkMessage -> String
+     * Should never fail*/
     @NotNull
     @Override
     public String toString() {

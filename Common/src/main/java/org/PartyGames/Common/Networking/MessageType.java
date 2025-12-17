@@ -8,7 +8,7 @@ public enum MessageType {
     ClientStatus,
     /** The Value that should be used for all Client Events (keys, requests) */
     ClientEvent,
-    /** The Value that should be used for All the Errors */
+    /** The Value that should be used for all the Errors */
     ClientError,
     ClientName,
     ClientDisconnect,

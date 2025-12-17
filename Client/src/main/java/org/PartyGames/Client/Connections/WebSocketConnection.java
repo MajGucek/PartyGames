@@ -14,8 +14,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class WebSocketConnection extends WebSocketClient {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketConnection.class);
@@ -27,9 +29,9 @@ public class WebSocketConnection extends WebSocketClient {
         server_messages = Collections.synchronizedList(new ArrayList<>());
     }
 
-
-    public void send(NetworkMessage data) {
-        if (!isConnected()) {
+    /** Sends the Message to the Server */
+    public void send(@NotNull NetworkMessage data) {
+        if (isNotConnected()) {
             logger.warn("No connection established");
         }
         super.send(data.toString());
@@ -63,9 +65,9 @@ public class WebSocketConnection extends WebSocketClient {
         is_connected = false;
     }
 
-
+    /** Get all the messages queued up, and clears them after! */
     public List<NetworkMessage> consumeMessages() throws WebsocketNotConnectedException {
-        if (!isConnected()) {
+        if (isNotConnected()) {
             is_connected = false;
             restart();
             throw new WebsocketNotConnectedException();
@@ -118,7 +120,7 @@ public class WebSocketConnection extends WebSocketClient {
     }
 
 
-    public boolean isConnected() {
-        return is_connected;
+    public boolean isNotConnected() {
+        return !is_connected;
     }
 }

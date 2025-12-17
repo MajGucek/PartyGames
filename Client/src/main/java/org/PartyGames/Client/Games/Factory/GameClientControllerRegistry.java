@@ -22,6 +22,7 @@ public final class GameClientControllerRegistry {
         );
     }
 
+    /** Singleton getter */
     public static GameClientControllerRegistry getInstance() {
         GameClientControllerRegistry result = instance;
         if (result != null) {
@@ -35,6 +36,8 @@ public final class GameClientControllerRegistry {
         }
     }
 
+    /** Tries to find a class with name.
+     * @param class_name The class you're searching for! */
     public Optional<Class<? extends GameClientController>> find(String class_name) {
         return this.controllers
                 .stream()

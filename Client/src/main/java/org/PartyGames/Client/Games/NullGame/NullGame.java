@@ -1,5 +1,6 @@
 package org.PartyGames.Client.Games.NullGame;
 
+import com.googlecode.lanterna.TextColor;
 import org.PartyGames.Client.Games.GameClientController;
 import org.PartyGames.Client.Sprites.Sprite;
 import org.PartyGames.Client.Terminal.IOController;
@@ -16,11 +17,13 @@ public class NullGame extends GameClientController {
     private ScheduledServiceController scheduler;
     private Sprite penguin;
     private Sprite dancer;
+    private TextColor.RGB border_color;
 
     public NullGame() {
         this.penguin = new Sprite();
         this.dancer = new Sprite();
         scheduler = new ScheduledServiceController();
+        this.border_color = null;
     }
 
     @Override
@@ -44,9 +47,24 @@ public class NullGame extends GameClientController {
         super.stop();
     }
 
+    private void drawBorder() {
+        String e = "@";
+        for (int i = 0; i < io_controller.getCharWidth(); i++) {
+            io_controller.drawText(e, i, 0);
+            io_controller.drawText(e, i, io_controller.getCharHeight() - 1);
+        }
+        for (int i = 0; i < io_controller.getCharHeight(); i++) {
+            io_controller.drawText(e, 0, i);
+            io_controller.drawText(e, io_controller.getCharWidth() - 1, i);
+        }
+
+
+    }
+
     @Override
     public void handleGame(List<NetworkMessage> messages, int tick) {
         io_controller.clearScreen();
+        drawBorder();
         io_controller.drawSprite(penguin, 2, 6, IOController.getRGB(255, 255, 255));
         io_controller.drawSprite(dancer, 20, 6);
         io_controller.drawText("Waiting for a Connection!", 2, 2);

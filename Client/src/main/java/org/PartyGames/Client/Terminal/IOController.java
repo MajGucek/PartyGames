@@ -42,17 +42,18 @@ public class IOController {
         logger.info("IOController registered on OS: {}", System.getProperty("os.name").toLowerCase());
         DefaultTerminalFactory default_terminal_factory = new DefaultTerminalFactory();
         if (isLinuxOS()) {
-            //defaultTerminalFactory.setForceTextTerminal(true);
+            //default_terminal_factory.setForceTextTerminal(true);
         }
         default_terminal_factory.setTerminalEmulatorTitle("Party Games");
         try {
             Terminal terminal = default_terminal_factory.createTerminal();
             logger.info("Created terminal off type: {}", terminal.getClass().getSimpleName());
+
             if (terminal instanceof SwingTerminalFrame frame) {
 
                 logger.info("Using SwingTerminalFrame!");
                 frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-                frame.setResizable(false);
+                frame.setResizable(true);
 
                 frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
                 frame.addWindowListener(new WindowAdapter() {
@@ -133,15 +134,16 @@ public class IOController {
 
 
     public int getCharWidth() {
-        return screen.getTerminalSize().getRows();
+        return screen.getTerminalSize().getColumns();
     }
     public int getCharHeight() {
-        return screen.getTerminalSize().getColumns();
+        return screen.getTerminalSize().getRows();
     }
 
 
     public void render() {
         try {
+            screen.doResizeIfNecessary();
             screen.refresh();
         } catch (IOException e) {
             logger.error("Error refreshing screen: {}", String.valueOf(e));
@@ -161,6 +163,11 @@ public class IOController {
     @SuppressWarnings("unused")
     public static TextColor.RGB getRGB(int r, int g, int b) {
         return new TextColor.RGB(r, g, b);
+    }
+
+    @SuppressWarnings("unused")
+    public static TextColor.RGB getRGB(int color) {
+        return new TextColor.RGB(color, color, color);
     }
 
 

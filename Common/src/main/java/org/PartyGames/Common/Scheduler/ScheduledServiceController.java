@@ -35,9 +35,6 @@ public class ScheduledServiceController {
         service_list.add(new ServiceWrapper("", service, tps));
     }
     public void removeService(String name) {
-        if (!initialized) {
-            throw new IllegalStateException("Scheduler not started - please call .start() not in constructor!");
-        }
         if (Objects.equals(name, "")) {
             throw new IllegalArgumentException("Cannot remove Service with no name!");
         }

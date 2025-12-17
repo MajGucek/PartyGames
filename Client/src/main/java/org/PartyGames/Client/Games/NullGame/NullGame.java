@@ -15,13 +15,13 @@ import java.util.List;
 public class NullGame extends GameClientController {
     private static final Logger logger = LoggerFactory.getLogger(NullGame.class);
     private ScheduledServiceController scheduler;
-    private Sprite penguin;
-    private Sprite dancer;
+    private Sprite wifi;
+    private Sprite x;
     private TextColor.RGB border_color;
 
     public NullGame() {
-        this.penguin = new Sprite();
-        this.dancer = new Sprite();
+        this.wifi = new Sprite();
+        this.x = new Sprite();
         scheduler = new ScheduledServiceController();
         this.border_color = null;
     }
@@ -29,23 +29,53 @@ public class NullGame extends GameClientController {
     @Override
     public void start() {
         super.start();
+        scheduler.start(getTPS());
         logger.warn("You've instantiated a NullGame Object, Beware!");
         try {
-            penguin.loadSprite("penguin");
-            dancer.loadSprite("dancer");
+            wifi.loadSprite("wifi");
+            x.loadSprite("X");
         } catch (Exception e) {
             logger.error("Couldn't load sprite: {}", String.valueOf(e));
             System.exit(1);
         }
 
-        scheduler.start(getTPS());
-        scheduler.addService("animate_dancer", () -> dancer.incrementFrame(), 10);
+
+        scheduler.addService("X_advance_frame", () -> x.incrementFrame(), 3);
     }
 
     @Override
     public void stop() {
         super.stop();
     }
+
+
+
+    @Override
+    public void handleGame(List<NetworkMessage> messages, int tick) {
+        io_controller.clearScreen();
+        drawBorder();
+        io_controller.drawSprite(
+                wifi,
+                io_controller.getHorizontalCenter() - wifi.getWidth() / 2,
+                io_controller.getVerticalCenter() - wifi.getHeight() / 2
+        );
+        io_controller.drawSprite(
+                x,
+                (io_controller.getHorizontalCenter() - x.getWidth() / 2) + 21,
+                (io_controller.getVerticalCenter() - x.getHeight() / 2) - 7,
+                IOController.getRGB(255, 0, 0)
+        );
+        String connection_text = "Waiting for a Connection!";
+        io_controller.drawText(
+                connection_text,
+                io_controller.getHorizontalCenter() - connection_text.length() / 2,
+                io_controller.getVerticalCenter() + 15
+        );
+        io_controller.render();
+        scheduler.executeServices(tick);
+    }
+
+
 
     private void drawBorder() {
         String e = "@";
@@ -57,18 +87,5 @@ public class NullGame extends GameClientController {
             io_controller.drawText(e, 0, i);
             io_controller.drawText(e, io_controller.getCharWidth() - 1, i);
         }
-
-
-    }
-
-    @Override
-    public void handleGame(List<NetworkMessage> messages, int tick) {
-        io_controller.clearScreen();
-        drawBorder();
-        io_controller.drawSprite(penguin, 2, 6, IOController.getRGB(255, 255, 255));
-        io_controller.drawSprite(dancer, 20, 6);
-        io_controller.drawText("Waiting for a Connection!", 2, 2);
-        io_controller.render();
-        scheduler.executeServices(tick);
     }
 }

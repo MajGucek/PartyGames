@@ -20,6 +20,11 @@ public class ScheduledServiceController {
     }
 
     public void start(int tps) {
+        if (tps == 0) {
+            throw new IllegalCallerException(
+                    "Please do NOT call start() method in constructor, The GameController data has not been finalized!"
+            );
+        }
         this.initialized = true;
         this.TPS = tps;
     }

@@ -15,7 +15,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import org.PartyGames.Client.Sprites.Sprite;
@@ -106,15 +105,28 @@ public class IOController {
     }
 
     public void drawSprite(Sprite sprite, int x, int y, TextColor.RGB color) {
-        List<String> rows = sprite.getSprite();
-        IntStream.range(0, rows.size()).forEach(i -> drawText(rows.get(i), x, y + i, color));
+        drawSprite(sprite, x, y, color, false);
     }
-
     @SuppressWarnings("unused")
     public void drawSprite(Sprite sprite, int x, int y) {
         drawSprite(sprite, x, y, getRGB(255, 255, 255));
     }
-    
+    @SuppressWarnings("unused")
+    public void drawSprite(Sprite sprite, int x, int y, TextColor.RGB color, boolean write_over_whitespace) {
+        List<String> rows = sprite.getSprite();
+
+        for (int i = 0; i < rows.size(); i++) {
+            for (int j = 0; j < rows.get(i).length(); j++) {
+                // @Char
+                String ch = String.valueOf(rows.get(i).charAt(j));
+                if (ch.equalsIgnoreCase(" ") && !write_over_whitespace) {
+                    continue;
+                }
+                drawText(ch, x + j, y + i, color);
+            }
+        }
+    }
+
     public void hideCursor() {
         if (screen != null) {
             screen.setCursorPosition(null);
@@ -139,6 +151,8 @@ public class IOController {
     public int getCharHeight() {
         return screen.getTerminalSize().getRows();
     }
+    public int getHorizontalCenter() { return getCharWidth() / 2; }
+    public int getVerticalCenter() { return getCharHeight() / 2; }
 
 
     public void render() {

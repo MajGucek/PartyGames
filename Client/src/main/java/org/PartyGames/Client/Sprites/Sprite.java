@@ -31,7 +31,8 @@ public class Sprite {
         this.current_frame = 0;
     }
 
-
+    public int getWidth() { return this.width; }
+    public int getHeight() { return height; }
 
     public List<String> getSprite() {
         if (this.sprite == null) {
@@ -43,7 +44,7 @@ public class Sprite {
     @SuppressWarnings("unused")
     public void incrementFrame() {
         if (frame_count == 1) {
-            logger.warn("Cannot increment Frame on a Sprite with only 1 frame");
+            logger.warn("Cannot increment Frame on a Sprite: {} with only 1 frame", this.file_name);
             return;
         }
 

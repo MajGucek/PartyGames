@@ -18,29 +18,33 @@ public class NullGame extends GameClientController {
     private Sprite wifi;
     private Sprite x;
     private TextColor.RGB border_color;
+    private boolean start_game;
 
     public NullGame() {
         this.wifi = new Sprite();
         this.x = new Sprite();
         scheduler = new ScheduledServiceController();
         this.border_color = null;
+        this.start_game = false;
     }
 
     @Override
     public void start() {
         super.start();
-        scheduler.start(getTPS());
         logger.warn("You've instantiated a NullGame Object, Beware!");
-        try {
-            wifi.loadSprite("wifi");
-            x.loadSprite("X");
-        } catch (Exception e) {
-            logger.error("Couldn't load sprite: {}", String.valueOf(e));
-            System.exit(1);
-        }
 
-
-        scheduler.addService("X_advance_frame", () -> x.incrementFrame(), 3);
+        scheduler.start(getTPS());
+        scheduler.scheduleService(() -> {
+            this.start_game = true;
+            try {
+                wifi.loadSprite("wifi");
+                x.loadSprite("X");
+            } catch (Exception e) {
+                logger.error("Couldn't load sprite: {}", String.valueOf(e));
+                System.exit(1);
+            }
+            scheduler.addService("X_advance_frame", () -> x.incrementFrame(), 3);
+        }, getTPS() * 2);
     }
 
     @Override
@@ -53,6 +57,15 @@ public class NullGame extends GameClientController {
     @Override
     public void handleGame(List<NetworkMessage> messages, int tick) {
         io_controller.clearScreen();
+        if (this.start_game) {
+            processUI();
+        }
+
+        io_controller.render();
+        scheduler.executeServices(tick);
+    }
+
+    private void processUI() {
         drawBorder();
         io_controller.drawSprite(
                 wifi,
@@ -71,8 +84,6 @@ public class NullGame extends GameClientController {
                 io_controller.getHorizontalCenter() - connection_text.length() / 2,
                 io_controller.getVerticalCenter() + 15
         );
-        io_controller.render();
-        scheduler.executeServices(tick);
     }
 
 

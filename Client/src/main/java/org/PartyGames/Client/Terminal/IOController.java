@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
+import com.sun.jdi.ClassNotLoadedException;
 import org.PartyGames.Client.Sprites.Sprite;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -108,7 +109,7 @@ public class IOController {
      * @param x The X starting position of the text.
      * @param y The Y starting position of the text.
      * @param color The color of the text. */
-    public void drawText(String text, int x, int y, TextColor.RGB color) {
+    public void drawText(@NotNull String text, int x, int y, TextColor.RGB color) {
         graphics.setForegroundColor(color);
         graphics.putString(new TerminalPosition(x, y), text);
     }
@@ -116,7 +117,7 @@ public class IOController {
      * @param text The String that gets drawn.
      * @param x The X starting position of the text.
      * @param y The Y starting position of the text. */
-    public void drawText(String text, int x, int y) {
+    public void drawText(@NotNull String text, int x, int y) {
         drawText(text, x, y, getRGB(255, 255, 255));
     }
     /** Draws a Sprite to the screen.
@@ -124,7 +125,7 @@ public class IOController {
      * @param x The X starting position of the text.
      * @param y The Y starting position of the text.
      * @param color The color of the Sprite. */
-    public void drawSprite(Sprite sprite, int x, int y, TextColor.RGB color) {
+    public void drawSprite(@NotNull Sprite sprite, int x, int y, TextColor.RGB color) {
         drawSprite(sprite, x, y, color, false);
     }
 
@@ -132,7 +133,7 @@ public class IOController {
      * @param sprite The Sprite that gets drawn.
      * @param x The X starting position of the text.
      * @param y The Y starting position of the text. */
-    public void drawSprite(Sprite sprite, int x, int y) {
+    public void drawSprite(@NotNull Sprite sprite, int x, int y) {
         drawSprite(sprite, x, y, getRGB(255, 255, 255));
     }
 
@@ -142,19 +143,24 @@ public class IOController {
      * @param y The Y starting position of the text.
      * @param color The color of the Sprite.
      * @param write_over_whitespace Draw the space character and override the background? */
-    public void drawSprite(Sprite sprite, int x, int y, TextColor.RGB color, boolean write_over_whitespace) {
-        List<String> rows = sprite.getSprite();
+    public void drawSprite(@NotNull Sprite sprite, int x, int y, TextColor.RGB color, boolean write_over_whitespace) {
+        try {
+            List<String> rows = sprite.getSprite();
 
-        for (int i = 0; i < rows.size(); i++) {
-            for (int j = 0; j < rows.get(i).length(); j++) {
-                // @Char
-                String ch = String.valueOf(rows.get(i).charAt(j));
-                if (ch.equalsIgnoreCase(" ") && !write_over_whitespace) {
-                    continue;
+            for (int i = 0; i < rows.size(); i++) {
+                for (int j = 0; j < rows.get(i).length(); j++) {
+                    // @Char
+                    String ch = String.valueOf(rows.get(i).charAt(j));
+                    if (ch.equalsIgnoreCase(" ") && !write_over_whitespace) {
+                        continue;
+                    }
+                    drawText(ch, x + j, y + i, color);
                 }
-                drawText(ch, x + j, y + i, color);
             }
+        } catch (ClassNotLoadedException e) {
+            logger.error("{}", String.valueOf(e));
         }
+
     }
 
     public void hideCursor() {

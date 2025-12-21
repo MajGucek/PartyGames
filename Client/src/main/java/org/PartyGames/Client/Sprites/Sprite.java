@@ -1,6 +1,7 @@
 package org.PartyGames.Client.Sprites;
 
 import com.google.gson.Gson;
+import com.sun.jdi.ClassNotLoadedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +38,9 @@ public class Sprite {
     /** Called internally when you call drawSprite().
      * @return Immutable version on the sprite List!
      * @throws IllegalStateException The sprite hasn't been correctly loaded! */
-    public List<String> getSprite() {
+    public List<String> getSprite() throws ClassNotLoadedException {
         if (this.sprite == null) {
-            throw new IllegalStateException("Sprite wasn't correctly loaded, returning null!");
+            throw new ClassNotLoadedException(file_name, "Sprite wasn't correctly loaded, returning null!");
         }
         return Collections.unmodifiableList(this.sprite.get(current_frame));
     }
@@ -57,7 +58,7 @@ public class Sprite {
             current_frame = 0;
         }
     }
-    /** Try to load the sprite in from the assets folder.
+    /** Try to load the sprite in from the asset folder.
      * @throws ParseException Sprite wasn't formatted correctly!
      * @throws FileNotFoundException File wasn't found! */
     public void loadSprite(String file_name) throws ParseException, FileNotFoundException {

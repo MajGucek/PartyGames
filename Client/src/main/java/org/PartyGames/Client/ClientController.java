@@ -38,7 +38,7 @@ public class ClientController {
     }
 
     private void checkConnectionTryReconnect() {
-        if (!connection.isConnected()) {
+        if (connection.isNotConnected()) {
             long now = System.currentTimeMillis();
             if (now - last_reconnect_attempt >= 2000) {
                 connection.restart();

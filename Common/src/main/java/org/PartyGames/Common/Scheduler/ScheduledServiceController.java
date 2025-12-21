@@ -10,14 +10,25 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class ScheduledServiceController {
     private final List<ServiceWrapper> service_list;
+    private final List<SingleServiceWrapper> single_service_list;
     private boolean initialized;
     private int TPS;
 
+    private static class SingleServiceWrapper {
+        public SingleService service;
+        public long tick_delay;
+        SingleServiceWrapper(SingleService service, long tick_delay) {
+            this.service = service;
+            this.tick_delay = tick_delay;
+        }
+
+    }
     private record ServiceWrapper(String name, Service service, int TPS) { }
 
     public ScheduledServiceController() {
         this.TPS = 0;
-        service_list = new LinkedList<>();
+        this.service_list = new LinkedList<>();
+        this.single_service_list = new LinkedList<>();
         this.initialized = false;
     }
     /** DO NOT call this method in Constructor, since by then the object creation hasn't been finalized.
@@ -36,8 +47,12 @@ public class ScheduledServiceController {
     public interface Service {
         void execute();
     }
+
+    public interface SingleService {
+        void execute();
+    }
     /**
-     * @param name The name of the service, usefull for removing it later.
+     * @param name The name of the service, useful for removing it later.
      * @param service Lambda expression.
      * @param tps How many times per second to execute the service at.
      * */
@@ -48,6 +63,11 @@ public class ScheduledServiceController {
     public void addService(Service service, int tps) {
         addService("", service, tps);
     }
+
+    public void scheduleService(SingleService single_service, int tick_delay) {
+        single_service_list.add(new SingleServiceWrapper(single_service, tick_delay));
+    }
+
     /** Tries to remove service that matches the name.
      * @throws NameNotFoundException If name not found. */
     public void removeService(String name) throws NameNotFoundException {
@@ -63,11 +83,19 @@ public class ScheduledServiceController {
         if (!initialized) {
             throw new IllegalStateException("Scheduler not started! Please call .start()");
         }
-        service_list.forEach(service -> {
-            if (tick % (TPS / service.TPS) == 0) {
-                service.service.execute();
+        service_list.forEach(service_wrapper -> {
+            if (tick % (TPS / service_wrapper.TPS) == 0) {
+                service_wrapper.service.execute();
             }
         });
+
+        single_service_list.forEach(service_wrapper -> {
+            service_wrapper.tick_delay--;
+            if (service_wrapper.tick_delay == 0) {
+                service_wrapper.service.execute();
+            }
+        });
+        single_service_list.removeIf(service_wrapper -> service_wrapper.tick_delay <= 0);
     }
 }
 

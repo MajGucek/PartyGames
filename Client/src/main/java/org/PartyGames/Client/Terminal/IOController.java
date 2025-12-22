@@ -1,6 +1,7 @@
 package org.PartyGames.Client.Terminal;
 
 
+import com.google.errorprone.annotations.DoNotCall;
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.sun.jdi.ClassNotLoadedException;
 import org.PartyGames.Client.Sprites.Sprite;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +42,10 @@ public class IOController {
         graphics = null;
     }
 
+    public record Point(int x, int y) { }
+
     /** Starts the IOController, checks for OS and Terminal Emulator. */
+    @DoNotCall
     public void start() {
         logger.info("IOController registered on OS: {}", System.getProperty("os.name").toLowerCase());
         DefaultTerminalFactory default_terminal_factory = new DefaultTerminalFactory();
@@ -76,7 +81,7 @@ public class IOController {
         }
     }
 
-
+    @DoNotCall
     public void stop() {
         try {
             screen.stopScreen();
@@ -106,44 +111,44 @@ public class IOController {
 
     /** Draws a String to the screen.
      * @param text The String that gets drawn.
-     * @param x The X starting position of the text.
-     * @param y The Y starting position of the text.
+     * @param point The starting position of the text.
      * @param color The color of the text. */
-    public void drawText(@NotNull String text, int x, int y, TextColor.RGB color) {
+    public void drawText(@NotNull String text, @NotNull Point point, TextColor.RGB color) {
         graphics.setForegroundColor(color);
-        graphics.putString(new TerminalPosition(x, y), text);
+        graphics.putString(new TerminalPosition(point.x(), point.y()), text);
     }
     /** Draws a String to the screen with white color.
      * @param text The String that gets drawn.
-     * @param x The X starting position of the text.
-     * @param y The Y starting position of the text. */
-    public void drawText(@NotNull String text, int x, int y) {
-        drawText(text, x, y, getRGB(255, 255, 255));
+     * @param point The starting position of the text. */
+    public void drawText(@NotNull String text, @NotNull Point point) {
+        drawText(text, point, getRGB(255, 255, 255));
     }
     /** Draws a Sprite to the screen.
      * @param sprite The Sprite that gets drawn.
-     * @param x The X starting position of the text.
-     * @param y The Y starting position of the text.
+     * @param point The starting position of the text.
      * @param color The color of the Sprite. */
-    public void drawSprite(@NotNull Sprite sprite, int x, int y, TextColor.RGB color) {
-        drawSprite(sprite, x, y, color, false);
+    public void drawSprite(@NotNull Sprite sprite, @NotNull Point point, TextColor.RGB color) {
+        drawSprite(sprite, point, color, false);
     }
 
     /** Draws a Sprite to the screen with white color.
      * @param sprite The Sprite that gets drawn.
-     * @param x The X starting position of the text.
-     * @param y The Y starting position of the text. */
-    public void drawSprite(@NotNull Sprite sprite, int x, int y) {
-        drawSprite(sprite, x, y, getRGB(255, 255, 255));
+     * @param point The starting position of the text. */
+    public void drawSprite(@NotNull Sprite sprite, @NotNull Point point) {
+        drawSprite(sprite, point, getRGB(255, 255, 255));
     }
 
     /** Draws a Sprite to the screen with white color.
      * @param sprite The Sprite that gets drawn.
-     * @param x The X starting position of the text.
-     * @param y The Y starting position of the text.
+     * @param point The starting position of the text.
      * @param color The color of the Sprite.
      * @param write_over_whitespace Draw the space character and override the background? */
-    public void drawSprite(@NotNull Sprite sprite, int x, int y, TextColor.RGB color, boolean write_over_whitespace) {
+    public void drawSprite(
+            @NotNull Sprite sprite,
+            @NotNull Point point,
+            TextColor.RGB color,
+            boolean write_over_whitespace
+    ) {
         try {
             List<String> rows = sprite.getSprite();
 
@@ -154,14 +159,23 @@ public class IOController {
                     if (ch.equalsIgnoreCase(" ") && !write_over_whitespace) {
                         continue;
                     }
-                    drawText(ch, x + j, y + i, color);
+                    drawText(ch, new Point(point.x() + j, point.y() + i), color);
                 }
             }
         } catch (ClassNotLoadedException e) {
             logger.error("{}", String.valueOf(e));
         }
-
     }
+
+    @SuppressWarnings("unused")
+    public void drawLine(@NotNull String character, @NotNull Point start, @NotNull Point end) {
+        if (character.length() != 1) {
+            logger.error("Drawing Line with character of length > 1");
+        } else {
+            graphics.drawLine(start.x(), start.y(), end.x(), end.y(), character.charAt(0));
+        }
+    }
+
 
     public void hideCursor() {
         if (screen != null) {
@@ -203,6 +217,7 @@ public class IOController {
     /** Get the latest user input.
      * @return Option, KeyStroke or empty */
     @NotNull
+    @CheckReturnValue
     public Optional<KeyStroke> poll() {
         try {
             return Optional.of(screen.pollInput());

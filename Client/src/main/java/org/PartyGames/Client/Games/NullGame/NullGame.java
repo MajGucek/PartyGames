@@ -6,6 +6,7 @@ import org.PartyGames.Client.Sprites.Sprite;
 import org.PartyGames.Client.Terminal.IOController;
 import org.PartyGames.Common.Networking.NetworkMessage;
 import org.PartyGames.Common.Scheduler.ScheduledServiceController;
+import org.PartyGames.Client.Terminal.IOController.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,7 @@ public class NullGame extends GameClientController {
                 System.exit(1);
             }
             scheduler.addService("X_advance_frame", () -> x.incrementFrame(), 3);
-        }, getTPS() * 2);
+        }, getTPS());
     }
 
     @Override
@@ -66,37 +67,31 @@ public class NullGame extends GameClientController {
     }
 
     private void processUI() {
-        drawBorder();
         io_controller.drawSprite(
                 wifi,
-                io_controller.getHorizontalCenter() - wifi.getWidth() / 2,
-                io_controller.getVerticalCenter() - wifi.getHeight() / 2
+                new Point(
+                        io_controller.getHorizontalCenter() - wifi.getWidth() / 2,
+                        io_controller.getVerticalCenter() - wifi.getHeight() / 2
+                )
+
         );
         io_controller.drawSprite(
                 x,
-                (io_controller.getHorizontalCenter() - x.getWidth() / 2) + 21,
-                (io_controller.getVerticalCenter() - x.getHeight() / 2) - 7,
+                new Point(
+                        (io_controller.getHorizontalCenter() - x.getWidth() / 2) + 21,
+                        (io_controller.getVerticalCenter() - x.getHeight() / 2) - 7
+                ),
                 IOController.getRGB(255, 0, 0)
         );
         String connection_text = "Waiting for a Connection!";
         io_controller.drawText(
                 connection_text,
-                io_controller.getHorizontalCenter() - connection_text.length() / 2,
-                io_controller.getVerticalCenter() + 15
+                new Point(
+                        io_controller.getHorizontalCenter() - connection_text.length() / 2,
+                        io_controller.getVerticalCenter() + 15
+                )
         );
     }
 
 
-
-    private void drawBorder() {
-        String e = "@";
-        for (int i = 0; i < io_controller.getCharWidth(); i++) {
-            io_controller.drawText(e, i, 0);
-            io_controller.drawText(e, i, io_controller.getCharHeight() - 1);
-        }
-        for (int i = 0; i < io_controller.getCharHeight(); i++) {
-            io_controller.drawText(e, 0, i);
-            io_controller.drawText(e, io_controller.getCharWidth() - 1, i);
-        }
-    }
 }

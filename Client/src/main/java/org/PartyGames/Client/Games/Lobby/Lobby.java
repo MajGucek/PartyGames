@@ -6,11 +6,13 @@ import org.PartyGames.Client.Games.GameClientController;
 import org.PartyGames.Client.Terminal.IOController;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
+import org.PartyGames.Client.Terminal.IOController.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+
 
 @SuppressWarnings("unused")
 public class Lobby extends GameClientController {
@@ -137,26 +139,36 @@ public class Lobby extends GameClientController {
 
         if (has_sent_name && !is_name_registered) {
             if (was_name_denied) {
-                io_controller.drawText("Your name was denied!", 0, 5, IOController.getRGB(255, 0, 0));
-                io_controller.drawText("Press Enter to re-enter name", 0, 6);
+                io_controller.drawText("Your name was denied!", new Point(0, 5), IOController.getRGB(255, 0, 0));
+                io_controller.drawText("Press Enter to re-enter name", new Point(0, 6));
             } else {
                 io_controller.drawText("You have sent Name: "
                         + unconfirmed_name +
-                        ", Waiting for response", 0, 5, IOController.getRGB(255, 0, 255));
+                        ", Waiting for response", new Point(0, 5), IOController.getRGB(255, 0, 255));
             }
 
         } else if (!has_sent_name && !is_name_registered) {
-            io_controller.drawText("Input Name: " + unconfirmed_name, 0, 5, IOController.getRGB(255, 125, 255));
+            io_controller.drawText(
+                    "Input Name: " + unconfirmed_name,
+                    new Point(0, 5),
+                    IOController.getRGB(255, 125, 255)
+            );
         }
 
         if (is_name_registered && !confirmed_name.isEmpty()) {
-            io_controller.drawText("Your Name: " + confirmed_name, 4, 2, IOController.getRGB(0, 255, 0));
-            io_controller.drawText("Press y/n to vote to start/remove your vote", 4, 3);
+            io_controller.drawText("Your Name: " + confirmed_name, new Point(4, 2), IOController.getRGB(0, 255, 0));
+            io_controller.drawText("Press y/n to vote to start/remove your vote", new Point(4, 3));
             if (vote_start_games) {
-                io_controller.drawText("Yes", 11, 4, IOController.getRGB(0, 0, 255));
+                io_controller.drawText("Yes", new Point(11, 4), IOController.getRGB(0, 0, 255));
             } else {
-                io_controller.drawText("No", 11, 4, IOController.getRGB(255, 0, 0));
+                io_controller.drawText("No", new Point(11, 4), IOController.getRGB(255, 0, 0));
             }
         }
+
+        doGraphics();
+    }
+
+    private void doGraphics() {
+
     }
 }

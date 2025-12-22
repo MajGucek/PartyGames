@@ -6,11 +6,13 @@ import org.PartyGames.Server.Games.Lobby.Lobby;
 import org.PartyGames.Server.Connections.WebSocketServer;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GameServerControllerFactory {
@@ -31,7 +33,12 @@ public class GameServerControllerFactory {
     }
 
     @NotNull
-    public GameServerController createGameServerController(String game_controller, WebSocketServer connection, int TPS)
+    public GameServerController createGameServerController(
+            @NotNull String game_controller,
+            @NotNull WebSocketServer connection,
+            int TPS,
+            @Nullable Map<String, String> client_names
+    )
             throws IllegalArgumentException
     {
         try {
@@ -44,7 +51,7 @@ public class GameServerControllerFactory {
                                 return new IllegalArgumentException("game_controller not found");
                             })
                             .getDeclaredConstructor().newInstance()
-                            .attachWebSocketServer(connection).attachTPS(TPS);
+                            .attachWebSocketServer(connection).attachTPS(TPS).attachClientNames(client_names);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             logger.error("Cannot create newInstance of: {}", game_controller);
         } catch (NoSuchMethodException e) {

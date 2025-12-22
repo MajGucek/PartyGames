@@ -115,7 +115,7 @@ public class IOController {
      * @param color The color of the text. */
     public void drawText(@NotNull String text, @NotNull Point point, TextColor.RGB color) {
         graphics.setForegroundColor(color);
-        graphics.putString(new TerminalPosition(point.x(), point.y()), text);
+        graphics.putString(new TerminalPosition(point.x, point.y), text);
     }
     /** Draws a String to the screen with white color.
      * @param text The String that gets drawn.
@@ -159,7 +159,7 @@ public class IOController {
                     if (ch.equalsIgnoreCase(" ") && !write_over_whitespace) {
                         continue;
                     }
-                    drawText(ch, new Point(point.x() + j, point.y() + i), color);
+                    drawText(ch, new Point(point.x + j, point.y + i), color);
                 }
             }
         } catch (ClassNotLoadedException e) {
@@ -172,7 +172,7 @@ public class IOController {
         if (character.length() != 1) {
             logger.error("Drawing Line with character of length > 1");
         } else {
-            graphics.drawLine(start.x(), start.y(), end.x(), end.y(), character.charAt(0));
+            graphics.drawLine(start.x, start.y, end.x, end.y, character.charAt(0));
         }
     }
 
@@ -220,11 +220,12 @@ public class IOController {
     @CheckReturnValue
     public Optional<KeyStroke> poll() {
         try {
-            return Optional.of(screen.pollInput());
+            KeyStroke key = screen.pollInput();
+            return key == null ? Optional.empty() : Optional.of(key);
         } catch (IOException e) {
             logger.error("Error polling inputs: {}", String.valueOf(e));
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     /** Static method for creating an RGB object. */

@@ -6,8 +6,11 @@ import org.PartyGames.Server.Connections.WebSocketServer;
 
 import org.PartyGames.Server.Games.Factory.GameServerControllerFactory;
 import org.PartyGames.Server.Games.GameServerController;
+import org.PartyGames.Server.Games.ReturnsNamesOnStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 public class ServerController {
     private static final Logger logger = LoggerFactory.getLogger(ServerController.class);
@@ -17,14 +20,16 @@ public class ServerController {
     private long last_time_sent_game;
     private final GameServerControllerFactory game_server_controller_factory;
     private long current_tick;
+    private Map<String, String> client_names;
 
     public ServerController(int port, int TPS) {
         connection = new WebSocketServer(port);
         this.TPS = TPS;
         game_server_controller_factory = new GameServerControllerFactory();
-        game_controller = game_server_controller_factory.createGameServerController("Lobby", connection, TPS);
+        game_controller = game_server_controller_factory.createGameServerController("Lobby", connection, TPS, null);
         last_time_sent_game = 0;
         this.current_tick = 0;
+        this.client_names = null;
     }
 
     private void notifyOfGameStrategy(String game) {
@@ -51,6 +56,10 @@ public class ServerController {
 
     public void update() {
         if (game_controller.isFinished()) {
+            if (game_controller instanceof ReturnsNamesOnStop returns_names_on_stop) {
+                this.client_names = returns_names_on_stop.getNames();
+            }
+
             connection.consumeMessages();
             connection.clearBuffer();
             logger.info("Finished with a game!");
@@ -58,7 +67,8 @@ public class ServerController {
             game_controller = game_server_controller_factory.createGameServerController(
                     game_server_controller_factory.getRandomGame(),
                     connection,
-                    TPS
+                    TPS,
+                    client_names
             );
 
             logger.info("Created Game: {}", game_controller.getClass().getSimpleName());
@@ -81,6 +91,7 @@ public class ServerController {
         } catch (InterruptedException e) {
             logger.error("Connection stop failed!{}", String.valueOf(e));
         }
+
         game_controller.stop();
         logger.info("Shutting down");
     }

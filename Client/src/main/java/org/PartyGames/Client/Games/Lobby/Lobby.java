@@ -164,11 +164,5 @@ public class Lobby extends GameClientController {
                 io_controller.drawText("No", new Point(11, 4), IOController.getRGB(255, 0, 0));
             }
         }
-
-        doGraphics();
-    }
-
-    private void doGraphics() {
-
     }
 }

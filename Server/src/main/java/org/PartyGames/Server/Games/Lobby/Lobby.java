@@ -3,6 +3,8 @@ package org.PartyGames.Server.Games.Lobby;
 import org.PartyGames.Server.Games.GameServerController;
 import org.PartyGames.Common.Networking.MessageType;
 import org.PartyGames.Common.Networking.NetworkMessage;
+import org.PartyGames.Server.Games.ReturnsNamesOnStop;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Lobby extends GameServerController {
+public class Lobby extends GameServerController implements ReturnsNamesOnStop {
     private static final Logger logger = LoggerFactory.getLogger(Lobby.class);
     /** Map: Client-ID -> Client-Name */
     private Map<String, String> client_names;
@@ -123,4 +125,9 @@ public class Lobby extends GameServerController {
         logger.info("Exiting Lobby state");
     }
 
+    @Override
+    @NotNull
+    public Map<String, String> getNames() {
+        return this.client_names;
+    }
 }

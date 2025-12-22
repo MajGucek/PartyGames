@@ -81,7 +81,7 @@ public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
         }
     }
 
-    public void notifyClients(NetworkMessage message) {
+    public void send(NetworkMessage message) {
         broadcast(message.toString());
     }
 

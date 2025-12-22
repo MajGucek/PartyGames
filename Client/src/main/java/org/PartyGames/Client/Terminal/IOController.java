@@ -17,6 +17,9 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.sun.jdi.ClassNotLoadedException;
@@ -37,9 +40,14 @@ public class IOController {
     /** modify "graphics" and then render the whole thing with screen.refresh() */
     private TextGraphics graphics;
 
+    private int prev_horizontal_size;
+    private int prev_vertical_size;
+
     public IOController() {
         screen = null;
         graphics = null;
+        prev_horizontal_size = 0;
+        prev_vertical_size = 0;
     }
 
     public record Point(int x, int y) { }
@@ -68,7 +76,6 @@ public class IOController {
                     @Override
                     public void windowClosing(WindowEvent e) {
                         System.exit(0);
-
                     }
                 });
             }
@@ -76,6 +83,25 @@ public class IOController {
             screen.startScreen();
             hideCursor();
             graphics = screen.newTextGraphics();
+            prev_horizontal_size = getCharWidth();
+            prev_vertical_size = getCharHeight();
+
+
+            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(r -> {
+                Thread t = new Thread(r);
+                t.setDaemon(true);
+                return t;
+            });
+
+            executor.scheduleAtFixedRate(() -> {
+                if (prev_vertical_size != getCharHeight() || prev_horizontal_size != getCharWidth()) {
+                    prev_horizontal_size = getCharWidth();
+                    prev_vertical_size = getCharHeight();
+                    logger.info("Resized to: {}x{}", prev_horizontal_size, prev_vertical_size);
+                }
+            }, 5, 200, TimeUnit.MILLISECONDS);
+
+
         } catch (IOException e) {
             logger.error("Error starting: {}", String.valueOf(e));
         }

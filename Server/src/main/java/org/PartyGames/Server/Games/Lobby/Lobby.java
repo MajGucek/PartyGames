@@ -52,7 +52,7 @@ public class Lobby extends GameServerController implements ReturnsNamesOnStop {
                                 .setAddress(client_id)
                                 .setData("Name already taken!");
                         // send to the Client a ClientError message
-                        connection.notifyClients(message);
+                        connection.send(message);
                         logger.warn("Woah, another client trying to use the same name: {}", data);
                     } else {
                         // this name isn't taken, register it.
@@ -64,7 +64,7 @@ public class Lobby extends GameServerController implements ReturnsNamesOnStop {
                                 .setAddress(client_id)
                                 .setData(data);
                         // send to the Client a ClientName message with content of the name
-                        connection.notifyClients(message);
+                        connection.send(message);
                         logger.info("Success! registered a new name: {}", data);
                     }
                 }

@@ -14,6 +14,8 @@ public class NetworkMessage {
     @NotNull private MessageType type;
     /** Send value with this */
     @Nullable private String data;
+    /** Use this for extra filtering */
+    @Nullable private String extra_filter;
     /** Address */
     @Nullable private String address;
 
@@ -23,10 +25,17 @@ public class NetworkMessage {
         type = MessageType.Invalid;
         data = null;
         address = "broadcast";
+        extra_filter = "";
     }
     /* --Constructors-- */
 
     /* Builder Pattern methods */
+    /** Use this field for any extra filtering of your own choice. */
+    @NotNull
+    public NetworkMessage setFilter(String filter) { extra_filter = filter; return this; }
+    @Nullable
+    public String getFilter() { return extra_filter; }
+
     @NotNull
     public NetworkMessage setMessageType(MessageType type) { this.type = type; return this; }
     @NotNull

@@ -37,7 +37,7 @@ public class ServerController {
         message.setToBroadcast().setMessageType(MessageType.GameStatus).setData(game);
         long now = System.currentTimeMillis();
         if (now - last_time_sent_game >= 2000) {
-            connection.notifyClients(message);
+            connection.send(message);
             last_time_sent_game = now;
         }
     }
@@ -49,7 +49,7 @@ public class ServerController {
         message.setToBroadcast()
                 .setMessageType(MessageType.NewGame)
                 .setData(game_controller.getClass().getSimpleName());
-        connection.notifyClients(message);
+        connection.send(message);
         game_controller.start();
         notifyOfGameStrategy(game_controller.getClass().getSimpleName());
     }
@@ -77,7 +77,7 @@ public class ServerController {
             message.setToBroadcast()
                     .setMessageType(MessageType.NewGame)
                     .setData(game_controller.getClass().getSimpleName());
-            connection.notifyClients(message);
+            connection.send(message);
             game_controller.start();
         }
 
